@@ -1,10 +1,10 @@
-# $Id: Makefile,v 3.0 1990/05/11 10:00:58 ste_cm Rel $
-# make-file for testing LINCNT
+# $Id: descrip.mms,v 3.0 1990/05/11 10:12:14 ste_cm Rel $
+# mms-file for testing LINCNT
 #
 
+.INCLUDE PORTUNIX_ROOT:[SUPPORT]LIBRARY_RULES
+
 ####### (Development) ##########################################################
-GET	= checkout
-DATE	= @ echo '**** '`date` >>$@
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
@@ -23,15 +23,21 @@ TST_FILES = \
 SOURCES	= Makefile descrip.mms README $(SCRIPTS) $(REF_FILES) $(TST_FILES)
 
 ####### (Standard Productions) #################################################
-all:		sources		; @echo 'Type "make run_tests"'
-clean:				; rm -f *.out
-clobber:	clean
-destroy:
-	sh -c 'for i in *;do case $$i in RCS);; *) rm -f $$i;;esac;done;exit 0'
-sources:	$(SOURCES)
-lint.out:
-lincnt.out:
-run_tests:	$(SOURCES)	; sh -c '$@.sh 2>&1 | tee -a $@.out'
+.LAST:
+	-remove -f *.dia;*
+
+ALL :
+	@ write sys$output "done with $@"
+
+CLEAN :
+	-remove -f *.log
+
+CLOBBER :	CLEAN
+	@ write sys$output "done with $@"
+DESTROY :
+	-remove -fv *.*;*
+
+RUN_TESTS :	$(SCRIPTS)
+	@run_tests
 
 ####### (Details of Productions) ###############################################
-$(SOURCES):			; $(GET) $@

@@ -1,4 +1,5 @@
-: '$Id: run_test.sh,v 1.1 1989/10/02 09:39:50 dickey Exp $'
+#!/bin/sh
+# $Id: run_test.sh,v 3.0 1990/05/11 08:03:32 ste_cm Rel $
 #
 PROG=../bin/lincnt
 TMP=/tmp/lincnt$$
