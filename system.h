@@ -1,4 +1,4 @@
-/* $Id: system.h,v 7.4 1995/05/14 23:50:36 tom Exp $ */
+/* $Id: system.h,v 7.9 1995/05/20 23:43:24 tom Exp $ */
 
 #ifdef HAVE_CONFIG_H
 
@@ -8,17 +8,27 @@
 #else
 	/* provide values for non-UNIX systems */
 # if defined(vms)
+#  include <stsdef.h>
 #  define SYS_VMS 1
+#  define EXIT_SUCCESS (STS$M_INHIB_MSG | STS$K_SUCCESS)
+#  define EXIT_FAILURE (STS$M_INHIB_MSG | STS$K_ERROR)
 # endif
+
+# if defined(MSDOS) || defined(__MSDOS__)
+#  define SYS_MSDOS 1
+# endif
+
+#define ANSI_PROTOS 1
+#define HAVE_STRCHR 1
 
 #endif /* HAVE_CONFIG_H */
 
 #ifndef ANSI_PROTOS
-#define ANSI_PROTOS 1
+#define ANSI_PROTOS 0
 #endif
 
 #ifndef HAVE_GETOPT_H
-#define HAVE_GETOPT_H 1
+#define HAVE_GETOPT_H 0
 #endif
 
 #ifndef HAVE_MALLOC_H
@@ -43,6 +53,14 @@
 
 #ifndef SYS_VMS
 #define SYS_VMS 0
+#endif
+
+#ifndef DECLARED_GETOPT
+#define DECLARED_GETOPT 0
+#endif
+
+#ifndef PRINT_ROUNDS_DOWN
+#define PRINT_ROUNDS_DOWN 0
 #endif
 
 	/* Macros that ought to be defined on every system */
@@ -71,3 +89,11 @@
 
 #undef EOS
 #define EOS	'\0'
+
+	/* On VMS and MSDOS we can fake wildcards by embedding a directory
+	 * scanning loop...
+	 */
+#if !SYS_UNIX
+extern	int	has_wildcard(char *);
+extern	int	expand_wildcard(char *, int);
+#endif

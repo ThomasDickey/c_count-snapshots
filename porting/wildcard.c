@@ -1,5 +1,5 @@
 #ifndef NO_IDENT
-static char *Id = "$Id: wildcard.c,v 1.1 1995/05/14 23:44:15 tom Exp $"
+static char *Id = "$Id: wildcard.c,v 1.2 1995/05/15 00:30:06 tom Exp $";
 #endif
 
 /*
@@ -10,9 +10,14 @@ static char *Id = "$Id: wildcard.c,v 1.1 1995/05/14 23:44:15 tom Exp $"
 
 #if SYS_VMS
 
+#include <stdlib.h>
+
+#include <starlet.h>		/* DEC-C (e.g., sys$parse) */
+#include <stdio.h>		/* perror */
+
 #include <rms.h>
 #include <descrip.h>
-#include <unixio.h>
+/*#include <unixio.h>*/
 #include <string.h>
 
 int	has_wildcard (char *path)
@@ -36,8 +41,8 @@ int	expand_wildcard (char *path, int initiate)
 		zfab.fab$l_dna = "*.*;";	/* Default-selection	*/
 		zfab.fab$b_dns = strlen(zfab.fab$l_dna);
 
-		zfab.fab$l_fna = filename;
-		zfab.fab$b_fns = strlen(filename);
+		zfab.fab$l_fna = path;
+		zfab.fab$b_fns = strlen(path);
 
 		znam = cc$rms_nam;
 		znam.nam$b_ess = sizeof(my_esa);
@@ -45,12 +50,12 @@ int	expand_wildcard (char *path, int initiate)
 		znam.nam$b_rss = sizeof(my_rsa);
 		znam.nam$l_rsa = my_rsa;
 
-		if (SYS$PARSE(&zfab) != RMS$_NORMAL) {
+		if (sys$parse(&zfab) != RMS$_NORMAL) {
 			perror(path);
 			exit(EXIT_FAILURE);
 		}
 	}
-	if (SYS$SEARCH(&zfab) == RMS$_NORMAL) {
+	if (sys$search(&zfab) == RMS$_NORMAL) {
 		strncpy(path, my_rsa, znam.nam$b_rsl)[znam.nam$b_rsl] = '\0';
 		return (TRUE);
 	}

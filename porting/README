@@ -8,7 +8,10 @@ program.
 		don't already have it (i.e., MSDOS, VMS).  Some systems that
 		support auto-configuration may need these files; you'll have to
 		edit the makefile in that case.
- 
+
+	wildcard.c - utility routines for expanding wildcards on non-UNIX
+		systems (VMS, MSDOS).
+
 	descrip.mms - makefile for VAX C.
 
-	turboc.mak - makefile for Turbo C/C++.
+	turboc.mak - makefile for Turbo C/C++ on MSDOS.
