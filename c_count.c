@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 1.18 1989/10/17 11:01:33 dickey Exp $";
+static	char	Id[] = "$Id: c_count.c,v 2.0 1990/05/10 16:01:43 ste_cm Rel $";
 #endif	lint
 
 /*
@@ -7,9 +7,16 @@ static	char	Id[] = "$Id: c_count.c,v 1.18 1989/10/17 11:01:33 dickey Exp $";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 1.18  1989/10/17 11:01:33  dickey
- * assume "//" begins C++ inline comments
+ * Revision 2.0  1990/05/10 16:01:43  ste_cm
+ * BASELINE Fri May 11 10:36:36 1990
  *
+ *		Revision 1.19  90/05/10  16:01:43  dickey
+ *		ported to VAX/VMS 5.3 (expand wildcards, added "-o" option).
+ *		made usage-message more verbose
+ *		
+ *		Revision 1.18  89/10/17  11:03:46  dickey
+ *		assume "//" begins C++ inline comments
+ *		
  *		Revision 1.17  89/10/05  13:04:20  dickey
  *		lint (apollo SR10 "string" defs)
  *		
@@ -37,6 +44,10 @@ static	char	Id[] = "$Id: c_count.c,v 1.18 1989/10/17 11:01:33 dickey Exp $";
  *		The file(s) are specified as command line arguments.  If no
  *		arguments are given, then the file is read from standard input.
  */
+
+#ifdef	vms
+#define	DIR_PTYPES
+#endif
 
 #define	STR_PTYPES
 #include	"ptypes.h"
@@ -87,10 +98,13 @@ register int j;
 char	name[256];
 
 	quotvec = vecalloc((unsigned)(argc * sizeof(char *)));
-	while ((j = getopt(argc,argv,"dvq:")) != EOF) switch(j) {
+	while ((j = getopt(argc,argv,"dvo:q:")) != EOF) switch(j) {
 	case 'd':	debug	= TRUE;
 			break;
 	case 'v':	verbose = TRUE;
+			break;
+	case 'o':	if (!freopen(optarg, "w", stdout))
+				usage();
 			break;
 	case 'q':	quotvec[quotdef++] = optarg;
 			break;
@@ -140,7 +154,22 @@ char	name[256];
 
 usage()
 {
-	PRINTF("usage: lincnt [-d] [-v] [-qDEFINE] [files]\n");
+	static	char	*tbl[] = {
+ "Usage: lincnt [options] [files]"
+,""
+,"If no files are specified as arguments, a list of filenames is read from the"
+,"standard input.  The special name \"-\" denotes a file which is read from the"
+,"standard input."
+,""
+,"Options:"
+," -d        debug (shows tokens as they are parsed)"
+," -v        verbose (shows lines as they are counted)"
+," -o file   specify alternative output-file"
+," -q DEFINE tells lincnt that the given name is an unbalanced quote"
+	};
+	register int	j;
+	for (j = 0; j < sizeof(tbl)/sizeof(tbl[0]); j++)
+		FPRINTF(stderr, "%s\n", tbl[j]);
 	(void)exit(FAIL);
 }
 
@@ -152,6 +181,27 @@ char	*name;
 {
 register int c;
 
+#ifdef	vms
+	if (vms_iswild(name)) {		/* expand wildcards */
+		auto	DIR		*dirp;
+		auto	struct	direct	*dp;
+		auto	char		pattern[BUFSIZ];
+
+		name = strcpy(pattern, name);
+		if (!strchr(name, ';'))
+			(void)strcat(name, ";");
+
+		if (dirp = opendir(name)) {
+			while (dp = readdir(dirp))
+				doFile(dp->d_name);
+			closedir(dirp);
+		} else {
+			perror(name);
+			exit(FAIL);
+		}
+		return;
+	}
+#endif
 	num_chars = tot_chars;
 	num_lines = tot_lines;
 	num_stmts = tot_stmts;
