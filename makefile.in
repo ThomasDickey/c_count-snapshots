@@ -1,4 +1,4 @@
-# $Id: makefile.in,v 7.4 1996/12/20 00:13:53 tom Exp $
+# $Id: makefile.in,v 7.6 2002/11/22 22:40:56 tom Exp $
 # Makefile-template for 'c_count'
 
 THIS = c_count
@@ -7,8 +7,8 @@ RELEASE = 7
 #### Start of system configuration section. ####
 
 @SET_MAKE@
-srcdir = @srcdir@
-VPATH  = @srcdir@
+srcdir 		= @srcdir@
+VPATH  		= @srcdir@
 
 CC		= @CC@
 LINK		= $(CC)
@@ -17,8 +17,8 @@ INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 
 LIBS		= @LIBS@
-CFLAGS		= @CFLAGS@
-LDFLAGS		=
+CFLAGS		= @CFLAGS@ @EXTRA_CFLAGS@
+LDFLAGS		= @LDFLAGS@
 LINT		= lint
 
 prefix		= @prefix@
@@ -33,7 +33,7 @@ manext		= 1
 
 SHELL		= /bin/sh
 
-CPPFLAGS	= -I. -I$(srcdir) -DHAVE_CONFIG_H
+CPPFLAGS	= -I. -I$(srcdir) -DHAVE_CONFIG_H @CPPFLAGS@
 
 LDFLAGS		= 
 
@@ -51,7 +51,6 @@ DISTFILES = configure $(SRC)
 all:	$(THIS)
 
 $(THIS): $(OBJ)
-	-mv $(THIS) o$(THIS)
 	$(LINK) $(LDFLAGS) -o $(THIS) $(OBJ) $(LIBS)
 
 install: all installdirs
@@ -64,17 +63,8 @@ installdirs:
 uninstall:
 	rm -f $(bindir)/$(THIS) $(mandir)/$(THIS).$(manext)
 
-makefile: makefile.in config.status
-	./config.status
-
-config.h: configure
-	./configure
-
-config.status: configure
-	./config.status --recheck
-
 mostlyclean:
-	- rm -f *.o o$(THIS) core *~ *.BAK
+	- rm -f *.o core *~ *.BAK
 	- rm -f Part?? part.*
 
 clean: mostlyclean
