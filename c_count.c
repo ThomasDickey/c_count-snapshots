@@ -1,5 +1,5 @@
 #ifndef	NO_IDENT
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.8 1995/05/14 23:51:03 tom Exp $";
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.12 1995/05/20 23:43:24 tom Exp $";
 #endif
 
 /*
@@ -81,9 +81,11 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
 #if HAVE_GETOPT_H
 #include <getopt.h>
 #else
+# if !DECLARED_GETOPT
 extern	int getopt ARGS((int argc, char **argv, char *opts));
 extern	int optind;
 extern	char *optarg;
+# endif
 #endif
 
 #if !HAVE_STRCHR		/* normally in <string.h> */
@@ -163,7 +165,13 @@ static	char	*dashes = "----------------";
 /************************************************************************
  *	local procedures						*
  ************************************************************************/
-#ifdef	sun
+#if PRINT_ROUNDS_DOWN
+ 	/*
+	 * When I compared output on Apollo SR10.1 with SunOS 4.1.1, I found
+	 * that sometimes the SunOS printf would round down (e.g., 0.05% would
+	 * be rendered as 0.0%).  This code is used to round up so that I'd get
+	 * the same numbers on different machines.
+	 */
 static	double	RoundUp(
 	_ARG(double,	value),
 	_ARG(double,	parts)
@@ -472,9 +480,16 @@ void	doFile (
 		auto	char	expanded[BUFSIZ];
 		auto	int	count	= 0;
 		(void) strcpy(expanded, name);
-		while (expand_wildcard(expanded, !count++)
+		while (expand_wildcard(expanded, !count++))
 			doFile(expanded);
 		return;
+	}
+	/* trim trailing blanks */
+	for (c = strlen(name); c > 0; c--) {
+		if (isspace(name[--c]))
+			name[c] = EOS;
+		else
+			break;
 	}
 #endif
 
