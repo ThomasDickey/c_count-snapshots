@@ -3,7 +3,8 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
- *		22 Nov 2002, Convert to ANSI C, indent'd
+ *		22 Nov 2002, Convert to ANSI C, indent'd.  Fix a bug in -q/-d
+ *			     logic.  Parse filename after #include as a string.
  *		27 Feb 2001, expand wildcards on WIN32 with _setargv().
  *			     Handle ^M^J line-endings for MSDOS, etc.
  *		11 Jan 1999, add check for files w/o trailing newline.
@@ -72,9 +73,10 @@
  */
 
 #include "system.h"
+#include "patchlev.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.31 2002/11/22 23:55:49 tom Exp $";
+static const char Id[] = "$Id: c_count.c,v 7.33 2002/11/23 01:30:14 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -491,6 +493,21 @@ add_totals(void)
 }
 
 /*
+ * Treat an included-filename as a string.
+ */
+static int
+IncludeFile(int c)
+{
+    while (c == ' ' || c == '\t')
+	c = inFile();
+    if (c == '"')
+	c = String(c);
+    else if (c == '<')
+	c = String('>');
+    return c;
+}
+
+/*
  * If '-q' option is in effect, append to the token-buffer until a token is
  * complete.  Test the completed token to see if it matches any of the strings
  * we have equated to '"'.  If so, process a string from that point.  Note that
@@ -512,55 +529,44 @@ Token(int c)
 
     int j = 0;
 
-    if (quotdef) {
-	if (bfr == 0) {
-	    bfr = malloc(have = 80);
-	}
+    if (bfr == 0)
+	bfr = malloc(have = 80);
+
+    if (TOKEN(c)) {
+	int word_length = 0;
 	One.words_total++;
-	while (TOKEN(c)) {
-	    One.words_length++;
-	    if (used + 2 >= have) {
+	do {
+	    if (used + 2 >= have)
 		bfr = realloc(bfr, have *= 2);
-	    }
 	    bfr[used++] = c;
+	    word_length++;
 	    c = inFile();
-	    j++;
-	}
-	if (used) {
+	} while (TOKEN(c));
+	bfr[used] = EOS;
+
+	DEBUG("%s\n", bfr);
+
+	One.words_length += word_length;
+	if (word_length >= limit_name)
+	    One.flags_2long++;
+
+	if (pstate == preprocessor && !strcmp(bfr, "include")) {
+	    c = IncludeFile(c);
+	} else if (quotdef) {
 	    if (c == ' ' || c == '\t' || c == '(') {
-		bfr[used] = EOS;
 		for (j = 0; j < quotdef; j++) {
 		    if (!strcmp(quotvec[j], bfr)) {
 			c = String('"');
-			DEBUG("**%c**", c);
+			DEBUG("**%c**\n", c);
 			break;
 		    }
 		}
-		DEBUG("%s\n", bfr);
 	    }
-	    used = 0;
-	} else if (j == 0) {
-	    c = inFile();
 	}
-	bfr[used] = 0;
-    } else {
-	if (TOKEN(c)) {
-	    int word_length = 0;
-	    One.words_total++;
-	    DEBUG("'");
-	    do {
-		word_length++;
-		DEBUG("%c", c);
-		c = inFile();
-	    } while (TOKEN(c));
-	    DEBUG("'\n");
-	    One.words_length += word_length;
-	    if (word_length >= limit_name)
-		One.flags_2long++;
-	} else {		/* punctuation */
-	    c = inFile();
-	}
+    } else {			/* punctuation */
+	c = inFile();
     }
+    used = 0;
     return (c);
 }
 
@@ -1107,6 +1113,7 @@ usage(void)
 	," -q DEFINE tells c_count that the given name is an unbalanced quote"
 	," -s        specialized statistics"
 	," -t        generate output for spreadsheet"
+	," -V        print the version"
 	," -v        verbose (shows lines as they are counted)"
 	," -w LEN    set threshold for too-long identifiers (default 32)"
     };
@@ -1130,7 +1137,7 @@ main(int argc, char **argv)
     _setargv(&argc, &argv);
 #endif
     quotvec = typeCalloc(char *, (size_t) argc);
-    while ((j = getopt(argc, argv, "bcdijlo:pq:stvw:")) != EOF) {
+    while ((j = getopt(argc, argv, "bcdijlo:pq:stVvw:")) != EOF) {
 	switch (j) {
 	case 'l':
 	    opt_all = FALSE;
@@ -1175,6 +1182,9 @@ main(int argc, char **argv)
 	case 't':
 	    spreadsheet = TRUE;
 	    break;
+	case 'V':
+	    printf("c_count version %d.%d\n", RELEASE, PATCHLEVEL);
+	    return EXIT_SUCCESS;
 	case 'w':
 	    limit_name = atoi(optarg);
 	    break;
@@ -1263,6 +1273,5 @@ main(int argc, char **argv)
 	show_totals(&All);
 	PRINTF("\n");
     }
-    (void) exit(EXIT_SUCCESS);
-    /*NOTREACHED */
+    return EXIT_SUCCESS;
 }

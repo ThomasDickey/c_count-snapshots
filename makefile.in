@@ -1,8 +1,9 @@
-# $Id: makefile.in,v 7.6 2002/11/22 22:40:56 tom Exp $
+# $Id: makefile.in,v 7.8 2002/11/23 01:47:44 tom Exp $
 # Makefile-template for 'c_count'
 
-THIS = c_count
-RELEASE = 7
+SHELL		= /bin/sh
+
+THIS		= c_count
 
 #### Start of system configuration section. ####
 
@@ -16,26 +17,23 @@ INSTALL		= @INSTALL@
 INSTALL_PROGRAM	= @INSTALL_PROGRAM@
 INSTALL_DATA	= @INSTALL_DATA@
 
-LIBS		= @LIBS@
 CFLAGS		= @CFLAGS@ @EXTRA_CFLAGS@
+CPPFLAGS	= -I. -I$(srcdir) -DHAVE_CONFIG_H @CPPFLAGS@
+
+LIBS		= @LIBS@
 LDFLAGS		= @LDFLAGS@
+
 LINT		= lint
 
 prefix		= @prefix@
 exec_prefix	= @exec_prefix@
 
-bindir		= $(exec_prefix)/bin
-libdir		= $(exec_prefix)/lib
-mandir		= $(prefix)/man/man1
+bindir		= @bindir@
+libdir		= @libdir@
+mandir		= @mandir@/man1
 manext		= 1
 
 #### End of system configuration section. ####
-
-SHELL		= /bin/sh
-
-CPPFLAGS	= -I. -I$(srcdir) -DHAVE_CONFIG_H @CPPFLAGS@
-
-LDFLAGS		= 
 
 .c.o:
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
@@ -51,7 +49,7 @@ DISTFILES = configure $(SRC)
 all:	$(THIS)
 
 $(THIS): $(OBJ)
-	$(LINK) $(LDFLAGS) -o $(THIS) $(OBJ) $(LIBS)
+	$(LINK) $(LDFLAGS) -o $(THIS) $(OBJ) $(LDFLAGS) $(LIBS)
 
 install: all installdirs
 	$(INSTALL_PROGRAM) $(THIS) $(bindir)/$(THIS)
@@ -88,16 +86,20 @@ tags:
 TAGS:
 	etags $(THIS).c $(HDRS)
 
+DIGITS   = sed -e 's/^[^0-9]*//g'
+RELEASE	 = `fgrep RELEASE    patchlev.h | $(DIGITS)`
+PATCHLEV = `fgrep PATCHLEVEL patchlev.h | $(DIGITS)`
+
 # I keep my sources in RCS, and assign a symbolic release to the current patch
 # level.  The 'manifest' script knows how to build a list of files for a given
 # revision.
 MANIFEST: patchlev.h
-	manifest -rv$(RELEASE)`fgrep PATCHLEVEL patchlev.h | sed -e s'/^[^0-9]*/_/'` \
+	manifest -rv$(RELEASE)_$(PATCHLEV) \
 		testing/case*.dcl testing/case*.bat
 
 dist: MANIFEST
 	- rm -f .fname .files
-	fgrep PATCHLEVEL patchlev.h | sed -e 's/[^0-9.]//g' -e 's/^/$(THIS)-$(RELEASE)./' >.fname
+	echo "$(THIS)-$(RELEASE).$(PATCHLEV)" >.fname
 	cat MANIFEST | grep ' ' | egrep -v ' subdirectory$$' | sed -e 's/\ .*//' | uniq >.files
 	rm -rf `cat .fname`
 	TOP=`cat .fname`; mkdir $$TOP `cat .files | grep / | sed -e 's@/.*@@' | sed -e s@\^@$$TOP/@ | uniq`
@@ -112,7 +114,7 @@ dist: MANIFEST
 # <CR><LF> terminated ".bat" files for MS-DOS.
 dist-shar: MANIFEST
 	- rm -f .fname .files
-	fgrep PATCHLEVEL patchlev.h | sed -e 's/[^0-9.]//g' -e 's/^/$(THIS)-$(RELEASE)./' >.fname
+	echo "$(THIS)-$(RELEASE).$(PATCHLEV)" >.fname
 	cat MANIFEST | grep ' ' | egrep -v ' subdirectory$$' | sed -e 's/\ .*//' | uniq >.files
 	shar -M -n`cat .fname` -opart -l50 `cat .files`
 	- rm -f .fname .files
