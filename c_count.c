@@ -3,6 +3,9 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		02 Jul 1998, add -w option, to set threshold for too-long
+ *			     identifiers.  Implement check for mismatched
+ *			     braces.
  *		08 Oct 1997, integrate -b option better, showing block and
  *			     level number if -v option is repeated.
  *		04 Oct 1997, add top-level block and blocklevel counts.
@@ -67,7 +70,7 @@
 #include "system.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.20 1997/10/08 22:41:19 tom Exp $";
+static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.24 1998/07/02 23:44:40 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -141,7 +144,8 @@ typedef	struct	{
 		long	flags_unquo,
 			flags_uncmt,
 			flags_unasc,
-			flags_unlvl;
+			flags_unlvl,
+			flags_2long;
 		long	stmts_total;
 		long	stmts_latch;
 		long	nesting_lvl;	/* {} nesting level */
@@ -159,6 +163,7 @@ static	long	old_block,
 		old_stmts,
 		old_unquo,
 		old_unasc,
+		old_2long,
 		old_unlvl,
 		old_uncmt;
 
@@ -179,6 +184,7 @@ static	int	verbose	= FALSE,/* TRUE iff we echo file, as processed */
 		spreadsheet = FALSE,
 		cms_history,
 		files_total,
+		limit_name = 32,
 		newsum;		/* TRUE iff we need a summary */
 
 static	char	*comma	= ",";
@@ -345,6 +351,7 @@ void	summarize_stats(
 	show_a_flag("\":lines with unterminated quotes",p->flags_unquo);
 	show_a_flag("*:unterminated/nested comments",	p->flags_uncmt);
 	show_a_flag("+:unterminated blocks",		p->flags_unlvl);
+	show_a_flag(">:too-long identifiers",		p->flags_2long);
 }
 
 static
@@ -426,19 +433,22 @@ void	summarize(
 			errors[c++] = '*';
 		if (p->flags_unlvl != old_unlvl)
 			errors[c++] = '+';
+		if (p->flags_2long != old_2long)
+			errors[c++] = '>';
 		errors[c] = EOS;
 		PRINTF ("%-3.3s%c",
 			errors,
 			(mark  ? '|' : ' '));
 	}
 	old_stmts = 0;
+	old_2long = p->flags_2long;
 	old_block = p->top_lvl_blk;
 	old_level = p->nesting_lvl;
+	old_stmts = p->stmts_total;
 	old_unasc = p->flags_unasc;
 	old_uncmt = p->flags_uncmt;
 	old_unlvl = p->flags_unlvl;
 	old_unquo = p->flags_unquo;
-	old_stmts = p->stmts_total;
 }
 
 static
@@ -474,6 +484,8 @@ void	add_totals (NO_ARGS)
 	ADD(flags_unquo);
 	ADD(flags_uncmt);
 	ADD(flags_unasc);
+	ADD(flags_unlvl);
+	ADD(flags_2long);
 
 	ADD(stmts_total);
 
@@ -483,6 +495,10 @@ void	add_totals (NO_ARGS)
 	ADD(top_lvl_blk);
 	ADD(lvl_weights);
 
+	if (One.nesting_lvl) {
+		One.flags_unlvl += One.nesting_lvl;
+		One.nesting_lvl = 0;
+	}
 	if (All.max_blk_lvl < One.max_blk_lvl)
 		All.max_blk_lvl = One.max_blk_lvl;
 	One.max_blk_lvl = 0;
@@ -538,14 +554,18 @@ int	Token(
 		bfr[len] = 0;
 	} else {
 		if (TOKEN(c)) {
+			int word_length = 0;
 			One.words_total++;
 			DEBUG("'");
 			do {
-				One.words_length++;
+				word_length++;
 				DEBUG("%c", c);
 				c = inFile();
 			} while (TOKEN(c));
 			DEBUG("'\n");
+			One.words_length += word_length;
+			if (word_length >= limit_name)
+				One.flags_2long++;
 		} else	/* punctuation */
 			c = inFile();
 	}
@@ -616,8 +636,12 @@ void	doFile (
 		case '}':
 			if (pstate == code) {
 				One.nesting_lvl--;
-				if (One.nesting_lvl == 0)
+				if (One.nesting_lvl == 0) {
 					topblock = TRUE;
+				} else if (One.nesting_lvl < 0) {
+					One.flags_unlvl += One.nesting_lvl;
+					One.nesting_lvl = 0;
+				}
 			}
 			c = Token(c);
 			break;
@@ -941,6 +965,7 @@ register int c = fgetc(File);
 		old_stmts =
 		old_unquo =
 		old_unlvl =
+		old_2long =
 		old_unasc =
 		old_uncmt = 0;
 		had_note  =
@@ -1069,6 +1094,7 @@ void	usage(NO_ARGS)
 ," -s        specialized statistics"
 ," -t        generate output for spreadsheet"
 ," -v        verbose (shows lines as they are counted)"
+," -w LEN    set threshold for too-long identifiers (default 32)"
 	};
 	register int	j;
 	for (j = 0; j < sizeof(tbl)/sizeof(tbl[0]); j++)
@@ -1092,7 +1118,7 @@ int	main (
 	auto	char	name[BUFSIZ];
 
 	quotvec = typeCalloc(char *, (size_t)argc);
-	while ((j = getopt(argc,argv,"bcdijlo:pq:stv")) != EOF) switch(j) {
+	while ((j = getopt(argc,argv,"bcdijlo:pq:stvw:")) != EOF) switch(j) {
 	case 'l':	opt_all = FALSE; opt_line = TRUE; break;
 	case 'b':	opt_all = FALSE; opt_blok = TRUE; break;
 	case 'c':	opt_all = FALSE; opt_char = TRUE; break;
@@ -1109,6 +1135,7 @@ int	main (
 	case 'q':	quotvec[quotdef++] = optarg;
 			break;
 	case 't':	spreadsheet = TRUE;	break;
+	case 'w':	limit_name = atoi(optarg); break;
 	default:	usage();
 	}
 
@@ -1142,12 +1169,13 @@ int	main (
 					"W-TOTAL",	comma,
 					"W-LENGTH",	comma);
 			if (opt_stat)
-				PRINTF("%s%s%s%s%s%s%s%s%s%s",
+				PRINTF("%s%s%s%s%s%s%s%s%s%s%s%s",
 					"CODE:COMMENT",	comma,
 					"ILLEGAL-CHARS", comma,
 					"ILLEGAL-QUOTES", comma,
 					"ILLEGAL-COMMENTS", comma,
-					"ILLEGAL-BLOCKS", comma);
+					"ILLEGAL-BLOCKS", comma,
+					"ILLEGAL-NAMES", comma);
 			if (opt_blok)
 				PRINTF("%s%s%s%s%s%s",
 					"TOP-BLOCKS", comma,
