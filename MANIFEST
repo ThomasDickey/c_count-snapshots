@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t19900510
+MANIFEST for c_count, version t19900511
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 COPYING                         copyright notice for C_COUNT
@@ -9,10 +9,12 @@ testing                         subdirectory
 testing/Makefile                makefile for C_COUNT test-directory
 testing/README                  description of files in testing-directory
 testing/cat.ref                 reference (output from 'cat' test)
+testing/descrip.mms             VMS build-script for C_COUNT testing
 testing/list.ref                reference (output from list-test)
 testing/normal.ref              reference (output from normal test)
 testing/pipe.ref                reference-results for LINCNT tests
 testing/quotes.ref              reference (output from unbalanced-quote test)
+testing/run_test.dcl            VMS test-script for C_COUNT
 testing/run_test.sh             UNIX test-script for C_COUNT
 testing/test1.c                 test-file (unbalanced quote via #define)
 testing/test2.c                 test-file (embedded tab)
