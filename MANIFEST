@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t19941012
+MANIFEST for c_count, version t19950513
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 COPYING                         copyright notice for C_COUNT
@@ -9,6 +9,7 @@ config_h.in                     template for config.h
 descrip.mms                     VMS build-script for C_COUNT
 install.sh                      install-script from X11
 mkdirs.sh                       mkinstalldirs script (renamed for porting)
+system.h                        template for autoconf includes
 porting                         subdirectory
 porting/getopt.c                public-domain version of 'getopt()'
 porting/getopt.h                interface of 'getopt()'
