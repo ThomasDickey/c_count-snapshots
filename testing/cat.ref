@@ -1,0 +1,19 @@
+     0     0   |#define	LEFT	printf("
+     1     0   |main()
+     2     0?" |{
+     3     0   |	LEFT junk, ending with \n");
+     4     0   |}
+     5     0?" |static	char	what[] = "@(#)filename	";
+     6     1   |
+     7     1   |main()
+     8     1   |{
+     9     1   |printf("test with a tab:	:embedded (not considered legal by LINCNT)\n");
+    10     2?  |}
+    11     2   |-
+--------
+     186 characters (4.8% whitespace): 0.00
+      14 tokens, average length 4.50
+      11 lines
+       2 statements
+       3 ?:illegal characters found
+       2 ":lines with unterminated quotes

@@ -1,0 +1,7 @@
+$Id: README,v 7.0 1989/10/02 09:40:40 ste_cm Rel $
+
+-------------------------------------------------------------------------------
+
+The test-cases for LINCNT are contrived to use all of the different switches
+defined for this utility. The results of each test are shown in the test-
+output, as well as any differences (should be none) from the reference-output.

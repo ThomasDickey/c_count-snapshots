@@ -1,0 +1,9 @@
+     5     0?" |test1.c
+     6     2?  |test2.c
+--------
+     186 characters (4.8% whitespace): 0.00
+      14 tokens, average length 4.50
+      11 lines
+       2 statements
+       3 ?:illegal characters found
+       2 ":lines with unterminated quotes

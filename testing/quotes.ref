@@ -1,0 +1,8 @@
+     5     1   |test1.c
+     6     2?  |test2.c
+--------
+     186 characters (10.2% whitespace): 0.00
+      46 tokens, average length 0.91
+      11 lines
+       3 statements
+       1 ?:illegal characters found
