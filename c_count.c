@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 3.0 1990/05/21 13:33:11 ste_cm Rel $";
+static	char	Id[] = "$Id: c_count.c,v 3.1 1990/08/29 09:08:36 dickey Exp $";
 #endif	lint
 
 /*
@@ -7,9 +7,12 @@ static	char	Id[] = "$Id: c_count.c,v 3.0 1990/05/21 13:33:11 ste_cm Rel $";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 3.0  1990/05/21 13:33:11  ste_cm
- * BASELINE Mon Jun 11 15:15:17 1990 -- added options a la a.count
+ * Revision 3.1  1990/08/29 09:08:36  dickey
+ * corrected format of 'show_flag()'
  *
+ *		Revision 3.0  90/05/21  13:33:11  ste_cm
+ *		BASELINE Mon Jun 11 15:15:17 1990 -- added options a la a.count
+ *		
  *		Revision 2.3  90/05/21  13:33:11  dickey
  *		corrected final (per-file) call on 'Summary()'
  *		
@@ -167,7 +170,7 @@ char	*text;
 long	flag;
 {
 	if (spreadsheet)
-		PRINTF("%s%ld", comma, flag);
+		PRINTF("%ld%s", flag, comma);
 	else if (flag)
 		PRINTF("%6ld\t%s\n", flag, text);
 }
@@ -194,10 +197,6 @@ STATS	*p;
 	new_summary();
 	per_cent("lines had comments",
 		p->lines_notes + p->lines_inline, den);
-	/* patch
-	if (!spreadsheet)
-		PRINTF("%6d\tcomments are preprocessor-style\n", lines_c_meta);
-	*/
 	per_cent("comments are inline",	  p->lines_inline,	-den);
 	per_cent("lines were blank",	  p->lines_blank,	den);
 	per_cent("lines for preprocessor",p->lines_prepro,	den);
