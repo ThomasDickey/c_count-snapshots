@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 1.16 1989/07/21 10:51:16 dickey Exp $";
+static	char	Id[] = "$Id: c_count.c,v 1.17 1989/10/05 13:04:20 dickey Exp $";
 #endif	lint
 
 /*
@@ -7,9 +7,12 @@ static	char	Id[] = "$Id: c_count.c,v 1.16 1989/07/21 10:51:16 dickey Exp $";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 1.16  1989/07/21 10:51:16  dickey
- * sccs2rcs keywords
+ * Revision 1.17  1989/10/05 13:04:20  dickey
+ * lint (apollo SR10 "string" defs)
  *
+ *		Revision 1.16  89/07/21  10:51:16  dickey
+ *		sccs2rcs keywords
+ *		
  *		21 Jul 1989, permit use of "-" to indicate standard input.
  *		15 Aug 1988, use 'vecalloc()' rather than 'malloc()'
  *		01 Jun 1988, added token-length statistic
@@ -32,9 +35,8 @@ static	char	Id[] = "$Id: c_count.c,v 1.16 1989/07/21 10:51:16 dickey Exp $";
  *		arguments are given, then the file is read from standard input.
  */
 
+#define	STR_PTYPES
 #include	"ptypes.h"
-
-#include	<stdio.h>
 #include	<ctype.h>
 extern	int	optind;
 extern	char	*optarg,
