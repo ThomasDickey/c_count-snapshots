@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.10 88/06/01 07:08:10";
+static	char	Id[] = "@(#)lincnt.c	1.12 88/08/09 09:46:21";
 #endif	lint
 
 /*
@@ -35,10 +35,6 @@ extern	int	optind;
 extern	char	*optarg, *malloc();
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
-#define	TRUE	1
-#define	FALSE	0
-#define	EOS	'\0'
-#define	PRINTF	(void) printf
 #define	DEBUG	if (debug) PRINTF
 #define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*((double)n))/((double)tot_chars));
 #define	TOKEN(c)	((c) == '_' || isalnum(c))
@@ -78,7 +74,7 @@ char	*argv[];
 register int j;
 char	name[256];
 
-	quotvec = (char **)malloc(argc * sizeof(char *));
+	quotvec = (char **)malloc((unsigned)(argc * sizeof(char *)));
 	while ((j = getopt(argc,argv,"dvq:")) != EOF) switch(j) {
 	case 'd':	debug	= TRUE;
 			break;
