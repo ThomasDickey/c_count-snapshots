@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 1.17 1989/10/05 13:04:20 dickey Exp $";
+static	char	Id[] = "$Id: c_count.c,v 1.18 1989/10/17 11:01:33 dickey Exp $";
 #endif	lint
 
 /*
@@ -7,9 +7,12 @@ static	char	Id[] = "$Id: c_count.c,v 1.17 1989/10/05 13:04:20 dickey Exp $";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 1.17  1989/10/05 13:04:20  dickey
- * lint (apollo SR10 "string" defs)
+ * Revision 1.18  1989/10/17 11:01:33  dickey
+ * assume "//" begins C++ inline comments
  *
+ *		Revision 1.17  89/10/05  13:04:20  dickey
+ *		lint (apollo SR10 "string" defs)
+ *		
  *		Revision 1.16  89/07/21  10:51:16  dickey
  *		sccs2rcs keywords
  *		
@@ -17,11 +20,11 @@ static	char	Id[] = "$Id: c_count.c,v 1.17 1989/10/05 13:04:20 dickey Exp $";
  *		15 Aug 1988, use 'vecalloc()' rather than 'malloc()'
  *		01 Jun 1988, added token-length statistic
  *		01 Jul 1987, test for junky files (i.e., non-ascii characters,
- *			     nested comments, non-graphic characters in quotes),
- *			     added '-v' verbose mode to show running totals &
- *			     status per-file.  Added '-q' option to handle the
- *			     case of unbalanced '"' in a macro (e.g., for a
- *			     common printf-prefix).
+ *			     nested comments, non-graphic characters in
+ *			     quotes), added '-v' verbose mode to show running
+ *			     totals & status per-file.  Added '-q' option to
+ *			     handle the case of unbalanced '"' in a macro
+ *			     (e.g., for a common printf-prefix).
  *		07 Nov 1986, added tested for unbalanced quote, comment so we
  *			     can get reasonable counts for ddn-driver, etc.
  *			     Also fixed printf-formats for xenix-port.
@@ -44,7 +47,8 @@ extern	char	*optarg,
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	DEBUG	if (debug) PRINTF
-#define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*((double)n))/((double)tot_chars));
+#define	PERCENT(n,s) PRINTF ("%.1f%% s",\
+			(100.0*((double)n))/((double)tot_chars));
 #define	TOKEN(c)	((c) == '_' || isalnum(c))
 
 static	FILE	*File;
@@ -111,7 +115,8 @@ char	name[256];
 			if (tot_notes)	PERCENT(tot_notes,comment);
 			PRINTF(")");
 			if (tot_stmts && bot_ratio) {
-				PRINTF (": %.2f", ((float)tot_notes)/bot_ratio);
+				PRINTF (": %.2f",
+					((float)tot_notes)/bot_ratio);
 			}
 		}
 		PRINTF("\n");
@@ -123,25 +128,20 @@ char	name[256];
 		if (tot_unasc)
 			PRINTF("%8ld ?:illegal characters found\n", tot_unasc);
 		if (tot_unquo)
-			PRINTF("%8ld \":lines with unterminated quotes\n", tot_unquo);
+			PRINTF("%8ld \":lines with unterminated quotes\n",
+				tot_unquo);
 		if (tot_uncmt)
-			PRINTF("%8ld *:unterminated/nested comments\n", tot_uncmt);
+			PRINTF("%8ld *:unterminated/nested comments\n",
+				tot_uncmt);
 	}
-	(void)exit(0);
+	(void)exit(SUCCESS);
 	/*NOTREACHED*/
-}
-
-failed(s)
-char	*s;
-{
-	perror(s);
-	(void)exit(1);
 }
 
 usage()
 {
-	PRINTF("usage: lincnt [-v] [-qDEFINE] [files]\n");
-	(void)exit(0);
+	PRINTF("usage: lincnt [-d] [-v] [-qDEFINE] [files]\n");
+	(void)exit(FAIL);
 }
 
 /*
@@ -170,7 +170,10 @@ register int c;
 		switch (c) {
 		case '/':
 			c = Token(EOS);
-			if (c == '*') c = Comment();
+			if (c == '*')
+				c = Comment(FALSE);
+			else if (c == '/')
+				c = Comment(TRUE);
 			break;
 		case '"':
 		case '\'':
@@ -330,11 +333,11 @@ register int c = inFile(),
 }
 
 /*
- * Entered immediately after reading '/','*', scan over a comment, returning the
- * first character after the comment.  Flags both unterminated comments and
- * nested comments with 'uncmt'.
+ * Entered immediately after reading '/','*', scan over a comment, returning
+ * the first character after the comment.  Flags both unterminated comments
+ * and nested comments with 'uncmt'.
  */
-int	Comment ()
+int	Comment (c_plus_plus)
 {
 register int c = inFile();
 int	d = 0;
@@ -343,12 +346,18 @@ int	d = 0;
 	while (c != EOF) {
 		if (isalnum(c))		tot_notes++;
 		else if (!isspace(c))	tot_white++;
-		if (c == '*') {
+		if (c_plus_plus) {
+			if (c == '\n')
+				return(c);
 			c = inFile();
-			if (c == '/')	return (inFile());
 		} else {
-			c = inFile();
-			if (c == '*' && d == '/')	uncmt++;
+			if (c == '*') {
+				c = inFile();
+				if (c == '/')	return (inFile());
+			} else {
+				c = inFile();
+				if (c == '*' && d == '/')	uncmt++;
+			}
 		}
 		d = c;
 	}
