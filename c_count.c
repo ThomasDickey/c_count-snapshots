@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.1 86/03/11 08:39:10";
+static	char	Id[] = "@(#)lincnt.c	1.2 86/04/23 10:55:02";
 #endif	lint
 
 #include	<stdio.h>
@@ -9,7 +9,8 @@ static	char	Id[] = "@(#)lincnt.c	1.1 86/03/11 08:39:10";
  * Title:	lincnt.c
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
- * Modified:	28 Jan 1985, make final 'exit()' with return code.
+ * Modified:	23 Apr 1986, treat standard-input as a list of names, not code.
+ *		28 Jan 1985, make final 'exit()' with return code.
  *
  * Function:	Count lines and statements in one or more C program files,
  *		giving statistics on percentage commented.
@@ -38,19 +39,14 @@ int	argc;
 char	*argv[];
 {
 register int j;
+char	name[256];
 
 	if (argc > 1) {
-		for (j = 1; j < argc; j++) {
-			if (File = fopen (argv[j], "r")) {
-				doFile (argv[j]);
-				fclose (File);
-			}
-		}
+		for (j = 1; j < argc; j++)
+			doFile (argv[j]);
 	}
-	else {
-		File = stdin;
-		doFile ("-");
-	}
+	else while (gets(name))
+		doFile (name);
 
 	if (tot_chars) {
 		printf ("--------\n");
@@ -82,6 +78,8 @@ register int c,
 	num_lines = tot_lines,
 	num_stmts = tot_stmts;
 
+	if (!(File = fopen (name, "r")))	 return;
+
 	c = inFile ();
 	while (c != EOF) {
 		switch (c) {
@@ -100,6 +98,7 @@ register int c,
 		}
 	}
 	printf ("%8d %8d %s\n", tot_lines-num_lines, tot_stmts-num_stmts, name);
+	fclose (File);
 }
 
 /*
