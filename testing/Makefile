@@ -1,4 +1,4 @@
-# $Id: Makefile,v 5.0 1990/08/30 08:05:08 ste_cm Rel $
+# $Id: Makefile,v 6.0 1991/10/21 16:07:34 ste_cm Rel $
 # make-file for testing LINCNT
 #
 
@@ -16,7 +16,9 @@ REF_FILES = \
 	history.ref \
 	list.ref \
 	normal.ref \
-	quotes.ref
+	quotes.ref \
+	table.ref \
+	table_p.ref
 
 TST_FILES = \
 	test1.c \
