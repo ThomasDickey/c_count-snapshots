@@ -3,6 +3,8 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		08 Oct 1997, integrate -b option better, showing block and
+ *			     level number if -v option is repeated.
  *		04 Oct 1997, add top-level block and blocklevel counts.
  *		25 Apr 1997, correct missing transition in comment-parsing
  *			     state that caused incorrect line-count.  Modify
@@ -65,7 +67,7 @@
 #include "system.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.17 1997/10/05 20:50:31 tom Exp $";
+static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.20 1997/10/08 22:41:19 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -152,7 +154,9 @@ typedef	struct	{
 
 static	STATS	All, One;	/* total, per-file stats */
 
-static	long	old_stmts,
+static	long	old_block,
+		old_level,
+		old_stmts,
 		old_unquo,
 		old_unasc,
 		old_unlvl,
@@ -166,6 +170,7 @@ static	int	verbose	= FALSE,/* TRUE iff we echo file, as processed */
 		jargon	= FALSE,
 		per_file= FALSE,
 		debug	= FALSE,
+		opt_all = -1,
 		opt_blok,
 		opt_line,
 		opt_char,
@@ -395,10 +400,23 @@ void	summarize(
 	} else {
 		PRINTF ("%6ld ",
 			p->lines_total + (mark && !name));
-		if ((p->stmts_total != old_stmts) || !mark) {
+		if ((p->stmts_total != old_stmts) || !mark || name) {
 			PRINTF ("%5ld", p->stmts_total);
 		} else {
 			PRINTF ("%5s", " ");
+		}
+		if (verbose > 1 || (opt_blok && !opt_all)) {
+			if ((name || !mark)
+			 || (mark && (p->top_lvl_blk != old_block)))
+				PRINTF ("  %5ld ", p->top_lvl_blk);
+			else
+				PRINTF ("%8s", " ");
+			if (name || !mark)
+				PRINTF (" %5ld  ", p->max_blk_lvl + 1);
+			else if (mark && (p->nesting_lvl != old_level))
+				PRINTF (" %5ld  ", p->nesting_lvl + 1);
+			else
+				PRINTF ("%8s", " ");
 		}
 		if (p->flags_unasc != old_unasc)
 			errors[c++] = '?';
@@ -413,6 +431,9 @@ void	summarize(
 			errors,
 			(mark  ? '|' : ' '));
 	}
+	old_stmts = 0;
+	old_block = p->top_lvl_blk;
+	old_level = p->nesting_lvl;
 	old_unasc = p->flags_unasc;
 	old_uncmt = p->flags_uncmt;
 	old_unlvl = p->flags_unlvl;
@@ -629,7 +650,7 @@ void	doFile (
 	(void)Token(EOS);
 	(void)fclose(File);
 
-	old_stmts = -1;	/* force # of statements to display */
+	old_stmts = 0;	/* force # of statements to display */
 
 	if (per_file && spreadsheet) {
 		show_totals(&One);
@@ -915,6 +936,9 @@ register int c = fgetc(File);
 
 	if (One.chars_total == 0) {
 		bstate    = code;
+		old_block =
+		old_level =
+		old_stmts =
 		old_unquo =
 		old_unlvl =
 		old_unasc =
@@ -1066,7 +1090,6 @@ int	main (
 {
 	register int j;
 	auto	char	name[BUFSIZ];
-	auto	int	opt_all = -1;
 
 	quotvec = typeCalloc(char *, (size_t)argc);
 	while ((j = getopt(argc,argv,"bcdijlo:pq:stv")) != EOF) switch(j) {
@@ -1079,7 +1102,7 @@ int	main (
 	case 'd':	debug	= TRUE;	break;
 	case 'j':	jargon	= TRUE;	break;
 	case 'p':	per_file= TRUE;	break;
-	case 'v':	verbose = TRUE;	break;
+	case 'v':	verbose++;	break;
 	case 'o':	if (!freopen(optarg, "w", stdout))
 				usage();
 			break;
@@ -1140,19 +1163,27 @@ int	main (
 		for (j = optind; j < argc; j++)
 			doFile (argv[j]);
 	} else {
-		while (gets(name)) {
+		while (fgets(name, sizeof(name)-1, stdin)) {
+			size_t len = strlen(name);
+			if (len != 0 && name[--len] == '\n')
+				name[len] = EOS;
 			doFile (name);
 		}
 	}
 
 	if (!spreadsheet && files_total) {
+		if (verbose > 1 || (opt_blok && !opt_all))
+			PRINTF ("%s", dashes);
 		if (!per_file) {
 			PRINTF ("%s\n", dashes);
 			summarize(&All,FALSE,FALSE);
-			PRINTF("%s\n",
+			PRINTF("%s",
 				jargon ?
 				"physical source statements/logical source statements" :
 				"total lines/statements");
+			if (opt_blok && !opt_all)
+				PRINTF(", top-level blocks, maximum nesting");
+			PRINTF("\n");
 		} else {
 			PRINTF("Grand total\n");
 			PRINTF ("%s\n", dashes);
