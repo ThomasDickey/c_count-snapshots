@@ -1,4 +1,4 @@
-.\" $Id: c_count.1,v 5.2 1991/10/21 17:13:15 dickey Exp $
+.\" $Id: c_count.1,v 5.4 1991/10/31 15:51:54 dickey Exp $
 .de DS
 .RS
 .nf
@@ -9,28 +9,37 @@
 .RE
 .sp .5
 ..
+.\" fool style
+.if n .ds z .
+.if t .ds z
+.
 .TH LINCNT 1
+.hy 0
+.
 .SH NAME
 .PP
 \fBlincnt\fR \- C-language line counter
+.
 .SH USAGE
 .PP
 \fBlincnt\fI [options] [file-specifications]
+.
 .SH SYNOPSIS
 .PP
 \fBLincnt\fR counts lines and statements in C-language source files.
 It provides related statistics on the amount of whitespace, comments
 and code.
 \fBLincnt\fR also shows the presence of unbalanced (or
-nested) comments, unbalanced '\fB"\fR' marks and illegal characters.
+nested) comments, unbalanced quotation marks and illegal characters.
+.
 .SH DESCRIPTION
 .PP
 \fBLincnt\fR reads one or more C-language source files and displays
 simple statistics about them.
 It counts statements (i.e., sequences
-of tokens terminated with '\fB;\fR') and measures the relative
+of tokens terminated with semicolon) and measures the relative
 amount of commentary.
-Semicolons are ignored where they appear in
+\fBLincnt\fR ignores semicolons where they appear in
 comments or in quoted literals.
 .PP
 A count of semicolons is a reasonable way of counting C statements.
@@ -41,33 +50,32 @@ The statistics summary shows you the relative amount of commentary.
 This is the ratio of the alphanumeric characters in comments to the
 total of characters in the code (ignoring tabs and other whitespace
 which are not inside quotes).
-Only alphanumeric characters are measured,
-since asterisks and other punctuation are often used as fillers.
-RCS and DEC/CMS history comments are also suppressed from this ratio.
+\fBLincnt\fR only counts alphanumeric characters,
+thus ignoring punctuation used as fillers.
+It also suppresses
+RCS and DEC/CMS history comments from this ratio.
 .PP
 \fBLincnt\fR counts the number of tokens (names and constants)
-in the source files, and gives this total, as well as their average length.
+in the source files and gives this total, as well as their average length.
 .PP
 \fBLincnt\fR provides you not only with measurements, but also
 diagnostics in the form of a set of flags shown next to each file name:
 .TP
 .ft B
 "
-is shown next to files which contain an unbalanced
-quote (\fB"\fR).
+file contains an unbalanced quote (\fB"\fR).
 .TP
 .B \?
-is shown next to files containing illegal characters
-(e.g., non-printing, non-whitespace characters such as an escape).
-Non-printing characters (e.g., tabs) inside quotes are treated as
-illegal characters.
+file contains illegal characters
+(e.g., nonprinting, nonwhitespace characters such as an escape).
+\fBLincnt\fR also flags tabs inside quotes.
 .TP
 .B *
-is shown next to files containing unterminated or nested comments.
+file contains unterminated or nested comments.
 .PP
 Unbalanced quotes may be legal.
 The C preprocessor permits you to
-define symbols which contain an unbalanced quote mark, e.g.,
+define symbols which contain an unbalanced quote mark, for example:
 .DS
 #define	WARN	(void)printf("** warning:
 	...
@@ -77,16 +85,18 @@ define symbols which contain an unbalanced quote mark, e.g.,
 Rather than duplicate all of the complexity of the C preprocessor,
 \fBlincnt\fR permits you to specify symbols which contain
 unbalanced quote marks.
+.
 .SH OPTIONS
+Command line options of \fBlincnt\fR are:
 .TP
 .B \-c
-display character-level statistics
+display character-level statistics.
 .TP
 .B \-d
-The debug shows each token as it is parsed from the input stream.
+show each token as \fBlincnt\fR parses it from the input stream.
 .TP
 .B \-i
-display identifier-level statistics
+display identifier-level statistics.
 .TP
 .B \-j
 annotate summary in technical format (i.e., "physical
@@ -94,46 +104,47 @@ source statements" and "logical source statements" for "lines"
 and "statements", respectively).
 .TP
 .B \-l
-display line-level statistics
+display line-level statistics.
 .TP
-.BI \-o file
-specify a file to which the report is written.
-The report is normally written to the standard output.
+.BI \-o " file"
+write the report to the specifed file,
+rather than to the standard output.
 .TP
 .B \-p
-display statistics on a per-file basis
+display statistics on a per-file basis.
 .TP
-.BI \-q define
-This option defines tokens which may
+.BI \-q " define"
+define tokens which may
 evaluate with an unbalanced quote mark '\fB"\fR'.
 For example,
 "-\fBq\ \fRWARN".
 .TP
 .B \-s
-display specialized statistics (e.g., code:comment ratio)
+display specialized statistics (e.g., code:comment ratio).
 .TP
 .B \-t
 generate output in spreadsheet format (e.g., comma-separated columns).
-If any of the options "-\fBc\fR", "-\fBi\fR",
-"-\fBl\fR" or "-\fBs\fR" is set, these statistics are generated.
-Otherwise only the lines/statements are generated.
+If you set any of the options "-\fBc\fR", "-\fBi\fR",
+"-\fBl\fR" or "-\fBs\fR", \fBlincnt\fR generates these statistics.
+Otherwise it generates only the lines/statements.
 .TP
 .B \-v
-The verbose option directs \fBlincnt\fR not only
+direct \fBlincnt\fR not only
 to print a summary line for each file, but also to print a running
-summary, showing each source line, together with the current line
+summary showing each source line, together with the current line
 and statement numbers, as well as the cumulative flags.
+.
 .SH OPERATIONS
 .PP
 \fBLincnt\fR reads one or more C language source files and writes
 its statistics to standard output.
-If no file names are given,
+If you do not give any file names,
 \fBlincnt\fR reads a list of file names from standard input.
 .PP
 The special filename "-" directs \fBlincnt\fR to read the file
 itself from the standard input.
 .PP
-An example of the use of \fBlincnt\fR is shown below, showing
+Following is an example of the use of \fBlincnt\fR, showing
 the detailed types of information which it reports.
 .DS
 bsd(5) lincnt */*.[ch]
@@ -167,22 +178,24 @@ bsd(5) lincnt */*.[ch]
      2	":lines with unterminated quotes
 .DE
 .PP
-If the "-\fBp\fR" option were used, the detailed information
-would be printed for each file, as well as for all files together.
+If you use the "-\fBp\fR" option,
+\fBlincnt\fR would print the detailed information
+for each file, as well as for all files together.
+.
 .SH ENVIRONMENT
 .PP
 \fBLincnt\fR runs in a portable UNIX\*R environment.
-On VAX/VMS, it is executed as a foreign command.
+Execute it on VAX/VMS by defining it as a foreign command.
+.
 .SH FILES
 .PP
-\fBLincnt\fR is a single binary module, which uses no auxiliary
+\fBLincnt\fR is a single binary module, that uses no auxiliary
 files (e.g., \fBLINCNT.EXE\fR on VAX/VMS).
-.SH ANTICIPATED CHANGES
-.PP
-None.
-.SH SEE ALSO
-.PP
-wc\ (1).
+.
 .SH AUTHOR
 .PP
-Thomas Dickey (Software Productivity Consortium).
+Thomas Dickey (Software Productivity Consortium)
+.
+.SH SEE ALSO
+.PP
+wc\ (1)
