@@ -1,5 +1,5 @@
-#ifndef	lint
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.1 1993/09/23 19:01:59 dickey Exp $";
+#ifndef	NO_IDENT
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.2 1993/11/29 01:16:36 dickey Exp $";
 #endif
 
 /*
@@ -640,7 +640,7 @@ int	filter_history(
 			while ((d = strchr(s, '$')) != NULL) {
 				s = d + 1;
 				if (!strncmp(d, "$Log", 4)
-				&&  (t = strchr(s, '$'))) {
+				&&  (t = strchr(s, '$')) != 0) {
 					hstate = rlog;
 					Disregard(d,t);
 					break;
@@ -652,7 +652,8 @@ int	filter_history(
 			while ((d = strchr(s, 'R')) != NULL) {
 				s = d + 1;
 				if (!strncmp(d, "Revision", 8)) {
-					strcpy(prefix, buffer)[d-buffer] = EOS;
+					size_t len = (size_t)(d-buffer);
+					strcpy(prefix, buffer)[len] = EOS;
 					hstate = revision;
 					s += strlen(s);
 					Disregard(d,s-2);
