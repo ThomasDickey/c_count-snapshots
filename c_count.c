@@ -1,12 +1,16 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.14 88/08/15 13:06:39";
+static	char	Id[] = "$Id: c_count.c,v 1.16 1989/07/21 10:51:16 dickey Exp $";
 #endif	lint
 
 /*
  * Title:	lincnt.c
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
- * Modified:
+ * $Log: c_count.c,v $
+ * Revision 1.16  1989/07/21 10:51:16  dickey
+ * sccs2rcs keywords
+ *
+ *		21 Jul 1989, permit use of "-" to indicate standard input.
  *		15 Aug 1988, use 'vecalloc()' rather than 'malloc()'
  *		01 Jun 1988, added token-length statistic
  *		01 Jul 1987, test for junky files (i.e., non-ascii characters,
@@ -150,7 +154,10 @@ register int c;
 	num_lines = tot_lines;
 	num_stmts = tot_stmts;
 
-	if (!(File = fopen (name, "r")))	 return;
+	if (!strcmp(name, "-"))
+		File = stdin;
+	else if (!(File = fopen (name, "r")))
+		return;
 
 	newsum = TRUE;
 	num_unasc = unasc = 0;
