@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t19930923
+MANIFEST for c_count, version t19940521
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 COPYING                         copyright notice for C_COUNT
@@ -6,6 +6,7 @@ README                          brief description of C_COUNT
 c_count.1                       manual-page for C_COUNT
 c_count.c                       C_COUNT main program
 descrip.mms                     VMS build-script for C_COUNT
+mkdirs.sh                       mkinstalldirs script (renamed for porting)
 testing                         subdirectory
 testing/Makefile                makefile for C_COUNT test-directory
 testing/README                  description of files in testing-directory
@@ -14,7 +15,6 @@ testing/descrip.mms             VMS build-script for C_COUNT testing
 testing/history.ref             reference (output from history-filtering)
 testing/list.ref                reference (output from list-test)
 testing/normal.ref              reference (output from normal test)
-testing/pipe.ref                reference-results for LINCNT tests
 testing/quotes.ref              reference (output from unbalanced-quote test)
 testing/run_test.dcl            VMS test-script for C_COUNT
 testing/run_test.sh             UNIX test-script for C_COUNT
