@@ -1,0 +1,4 @@
+$Id: README,v 3.0 1989/10/02 08:00:42 ste_cm Rel $
+
+LINCNT counts C-language source statements, and summarizes statistics
+about the relative amount of commentary, illegal characters, etc.
