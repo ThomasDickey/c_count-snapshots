@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 5.0 1991/05/23 08:05:42 ste_cm Rel $";
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 5.1 1991/10/16 16:04:54 dickey Exp $";
 #endif
 
 /*
@@ -7,9 +7,13 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 5.0  1991/05/23 08:05:42  ste_cm
- * BASELINE Wed Jun 12 17:42:45 1991 -- apollo sr10.3
+ * Revision 5.1  1991/10/16 16:04:54  dickey
+ * header-label for spreadsheet had "STATEMENTS" and "LINES"
+ * interchanged (fixed).  Also, converted to ANSI.
  *
+ *		Revision 5.0  91/05/23  08:05:42  ste_cm
+ *		BASELINE Wed Jun 12 17:42:45 1991 -- apollo sr10.3
+ *		
  *		Revision 4.1  91/05/23  08:05:42  dickey
  *		apollo sr10.3 cpp complains about endif-tags
  *		
@@ -93,11 +97,10 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
 #endif
 
 #define	STR_PTYPES
-#include	"ptypes.h"
+#include	<ptypes.h>
 #include	<ctype.h>
 extern	int	optind;
-extern	char	*optarg,
-		**vecalloc();
+extern	char	*optarg;
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	DEBUG	if (debug) PRINTF
@@ -160,8 +163,12 @@ static	char	*dashes = "----------------";
  *	local procedures						*
  ************************************************************************/
 #ifdef	sun
-static	double	roundup(value,parts)
-	double	value, parts;
+static	double	roundup(
+	_ARX(double,	value)
+	_AR1(double,	parts)
+		)
+	_DCL(double,	value)
+	_DCL(double,	parts)
 	{
 		long	temp = value * parts * 10.0;
 		if ((temp % 10) == 5)	temp++;
@@ -172,16 +179,21 @@ static	double	roundup(value,parts)
 #endif
 
 static
-new_summary()
+new_summary(_AR0)
 {
 	if (!spreadsheet)
 		PRINTF ("\n");
 }
 
 static
-per_cent(text, num, den)
-long	num, den;
-char	*text;
+per_cent(
+_ARX(char *,	text)
+_ARX(long,	num)
+_AR1(long,	den)
+	)
+_DCL(char *,	text)
+_DCL(long,	num)
+_DCL(long,	den)
 {
 	double	value;
 	if (spreadsheet) {
@@ -196,9 +208,12 @@ char	*text;
 }
 
 static
-show_a_flag(text,flag)
-char	*text;
-long	flag;
+show_a_flag(
+_ARX(char *,	text)
+_AR1(long,	flag)
+	)
+_DCL(char *,	text)
+_DCL(long,	flag)
 {
 	if (spreadsheet)
 		PRINTF("%ld%s", flag, comma);
@@ -207,9 +222,14 @@ long	flag;
 }
 
 static
-ratio(text, num, den)
-char	*text;
-long	num, den;
+ratio(
+_ARX(char *,	text)
+_ARX(long,	num)
+_AR1(long,	den)
+	)
+_DCL(char *,	text)
+_DCL(long,	num)
+_DCL(long,	den)
 {
 	if (den == 0) den = 1;
 	if (spreadsheet) {
@@ -220,8 +240,9 @@ long	num, den;
 }
 
 static
-summarize_lines(p)
-STATS	*p;
+summarize_lines(
+_AR1(STATS *,	p))
+_DCL(STATS *,	p)
 {
 	auto	long	den = p->lines_total;
 
@@ -243,8 +264,9 @@ STATS	*p;
 }
 
 static
-summarize_chars(p)
-STATS	*p;
+summarize_chars(
+_AR1(STATS *,	p))
+_DCL(STATS *,	p)
 {
 	auto	long	den = p->chars_total;
 
@@ -264,8 +286,9 @@ STATS	*p;
 }
 
 static
-summarize_names(p)
-STATS	*p;
+summarize_names(
+_AR1(STATS *,	p))
+_DCL(STATS *,	p)
 {
 	new_summary();
 	if (spreadsheet) {
@@ -281,8 +304,9 @@ STATS	*p;
 }
 
 static
-summarize_stats(p)
-STATS	*p;
+summarize_stats(
+_AR1(STATS *,	p))
+_DCL(STATS *,	p)
 {
 	new_summary();
 	ratio("comment:code", p->chars_notes, p->chars_prepro + p->chars_code);
@@ -292,8 +316,9 @@ STATS	*p;
 }
 
 static
-show_totals(p)
-STATS	*p;
+show_totals(
+_AR1(STATS *,	p))
+_DCL(STATS *,	p)
 {
 	if (opt_line)	summarize_lines(p);
 	if (opt_char)	summarize_chars(p);
@@ -302,8 +327,12 @@ STATS	*p;
 }
 
 static
-summarize(p,mark)
-STATS	*p;
+summarize(
+_ARX(STATS *,	p)
+_AR1(int,	mark)
+	)
+_DCL(STATS *,	p)
+_DCL(int,	mark)
 {
 	newsum = FALSE;
 	if (spreadsheet) {
@@ -325,7 +354,9 @@ STATS	*p;
 }
 
 static
-Summary(mark)
+Summary(
+_AR1(int,	mark))
+_DCL(int,	mark)
 {
 	if (newsum)
 		summarize(&One,mark);
@@ -334,7 +365,7 @@ Summary(mark)
 #define	ADD(m)	All.m += One.m; One.m = 0
 
 static
-add_totals()
+add_totals (_AR0)
 {
 	ADD(chars_total);
 	ADD(chars_blank);
@@ -376,7 +407,9 @@ add_totals()
  * be expanded there, e.g., if it is followed by a space or tab.
  */
 static
-Token(c)
+Token(
+_AR1(int,	c))
+_DCL(int,	c)
 {
 static	char	bfr[80];
 static	int	len = 0;
@@ -426,8 +459,9 @@ register int	j = 0;
  * Process a single file:
  */
 static
-doFile (name)
-char	*name;
+doFile (
+_AR1(char *,	name))
+_DCL(char *,	name)
 {
 register int c;
 
@@ -504,8 +538,9 @@ register int c;
  * string (perhaps because the leading quote was in a macro!).
  */
 static
-String (mark)
-char	mark;
+String (
+_AR1(int,	mark))
+_DCL(int,	mark)
 {
 register int c = inFile();
 char	*p = "@(#)";			/* permit literal tab here only! */
@@ -541,7 +576,7 @@ char	*p = "@(#)";			/* permit literal tab here only! */
  */
 static
 int
-Escape ()
+Escape (_AR0)
 {
 register int c = inFile(),
 	digits = 0;
@@ -561,8 +596,12 @@ register int c = inFile(),
  * RCS history mechanism.
  */
 static
-Disregard(lo,hi)
-char	*lo, *hi;
+Disregard(
+_ARX(char *,	lo)
+_AR1(char *,	hi)
+	)
+_DCL(char *,	lo)
+_DCL(char *,	hi)
 {
 	while (lo <= hi) {
 		if (isalnum(*lo)) {
@@ -590,7 +629,9 @@ char	*lo, *hi;
  * unlike the RCS history.
  */
 static
-filter_history(first)
+filter_history(
+_AR1(int,	first))
+_DCL(int,	first)
 {
 	typedef	enum	HSTATE	{unknown, cms, rlog, revision, contents};
 	static	char	*CMS_	= "DEC/CMS REPLACEMENT HISTORY,";
@@ -674,7 +715,9 @@ filter_history(first)
  */
 static
 int
-Comment (c_plus_plus)
+Comment (
+_AR1(int,	c_plus_plus))
+_DCL(int,	c_plus_plus)
 {
 	register int	c;
 	auto	int	d = 0;
@@ -720,7 +763,7 @@ Comment (c_plus_plus)
  */
 static
 int
-inFile ()
+inFile (_AR0)
 {
 	static	int	last_c;
 	static	int	is_blank;	/* true til we get nonblank on line */
@@ -811,7 +854,7 @@ register int c = fgetc(File);
 }
 
 
-usage()
+usage(_AR0)
 {
 	static	char	*tbl[] = {
  "Usage: lincnt [options] [files]"
@@ -843,9 +886,7 @@ usage()
  *	main procedure							*
  ************************************************************************/
 
-main (argc, argv)
-int	argc;
-char	*argv[];
+_MAIN
 {
 	register int j;
 	auto	char	name[BUFSIZ];
@@ -908,7 +949,7 @@ char	*argv[];
 					"ILLEGAL-COMMENTS", comma);
 
 		} else
-			PRINTF("STATEMENTS%sLINES%s", comma, comma);
+			PRINTF("LINES%sSTATEMENTS%s", comma, comma);
 		PRINTF("FILENAME\n");
 	}
 
