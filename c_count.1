@@ -1,4 +1,4 @@
-.\" $Id: c_count.1,v 5.7 1991/11/04 10:19:28 dickey Exp $
+.\" $Id: c_count.1,v 7.0 1991/12/04 09:39:20 ste_cm Rel $
 .de EX
 .RS
 .nf
@@ -101,7 +101,7 @@ display identifier-level statistics.
 .B \-j
 annotate summary in technical format (i.e., "physical
 source statements" and "logical source statements" for "lines"
-and "statements", respectively).
+and "statements" respectively).
 .TP
 .B \-l
 display line-level statistics.
@@ -117,7 +117,13 @@ display statistics on a per-file basis.
 define tokens which may
 evaluate with an unbalanced quote mark '\fB"\fR'.
 For example,
-"\fB\-q\ \fRWARN".
+.RS
+.EX
+-q\ WARN
+.EE
+.PP
+tells \fBlincnt\fR that the token "WARN" contains a quote mark.
+.RE
 .TP
 .B \-s
 display specialized statistics (e.g., code:comment ratio).
@@ -194,7 +200,7 @@ files (e.g., \fBLINCNT.EXE\fR on VAX/VMS).
 .
 .SH AUTHOR
 .PP
-Thomas Dickey (Software Productivity Consortium)
+Thomas Dickey (Software Productivity Consortium).
 .
 .SH SEE ALSO
 .PP
