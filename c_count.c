@@ -3,6 +3,9 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		25 Apr 1997, correct missing transition in comment-parsing
+ *			     state that caused incorrect line-count.  Modify
+ *			     display of line/statement #'s to be more readable.
  *		18 Dec 1996, allow '$' in tokens.  Correct handling of C++
  *			     comments (were always treated as inline because
  *			     of incorrect state processing in inFile()).
@@ -61,7 +64,7 @@
 #include "system.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.13 1996/12/19 01:17:10 tom Exp $";
+static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.14 1997/04/25 16:11:41 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -135,13 +138,15 @@ typedef	struct	{
 			flags_uncmt,
 			flags_unasc;
 		long	stmts_total;
+		long	stmts_latch;
 		long	words_total,	/* # of tokens */
 			words_length;	/* total length of tokens */
 	} STATS;
 
 static	STATS	All, One;	/* total, per-file stats */
 
-static	long	old_unquo,
+static	long	old_stmts,
+		old_unquo,
 		old_unasc,
 		old_uncmt;
 
@@ -352,9 +357,14 @@ void	summarize(
 			p->lines_total,	comma,
 			p->stmts_total,	comma);
 	} else {
-		PRINTF ("%6ld %5ld%c%c%c%c",
-			p->lines_total,
-			p->stmts_total,
+		PRINTF ("%6ld ",
+			p->lines_total + 1);
+		if ((p->stmts_total != old_stmts) || !mark) {
+			PRINTF ("%5ld", p->stmts_total);
+		} else {
+			PRINTF ("%5s", " ");
+		}
+		PRINTF ("%c%c%c%c",
 			(p->flags_unasc != old_unasc ? '?' : ' '),
 			(p->flags_unquo != old_unquo ? '"' : ' '),
 			(p->flags_uncmt != old_uncmt ? '*' : ' '),
@@ -363,6 +373,7 @@ void	summarize(
 	old_unasc = p->flags_unasc;
 	old_uncmt = p->flags_uncmt;
 	old_unquo = p->flags_unquo;
+	old_stmts = p->stmts_total;
 }
 
 static
@@ -527,6 +538,8 @@ void	doFile (
 	}
 	(void)Token(EOS);
 	(void)fclose(File);
+
+	old_stmts = -1;	/* force # of statements to display */
 
 	if (per_file && spreadsheet) {
 		show_totals(&One);
@@ -834,7 +847,7 @@ register int c = fgetc(File);
 		}
 
 		if (verbose) {
-			c = putchar(c);
+			(void) putchar(c);
 		}
 
 		One.chars_total++;
@@ -864,7 +877,7 @@ register int c = fgetc(File);
 					if (had_note) {
 						One.lines_inline++;
 					}
-				} else if (had_note) {
+				} else if (had_note || pstate == comment) {
 					One.lines_notes++;
 				}
 				had_code =
