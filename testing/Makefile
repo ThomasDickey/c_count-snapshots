@@ -1,10 +1,8 @@
-# $Id: Makefile,v 6.0 1991/10/21 16:07:34 ste_cm Rel $
+# $Id: Makefile,v 6.1 1992/10/19 08:35:46 dickey Exp $
 # make-file for testing LINCNT
-#
 
-####### (Development) ##########################################################
-GET	= checkout
-DATE	= @ echo '**** '`date` >>$@
+TOP	= ../..
+include $(TOP)/cm_library/support/cm_library.mk
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
@@ -28,15 +26,14 @@ TST_FILES = \
 SOURCES	= Makefile descrip.mms README $(SCRIPTS) $(REF_FILES) $(TST_FILES)
 
 ####### (Standard Productions) #################################################
-all:		sources		; @echo 'Type "make run_tests"'
-clean:				; rm -f *.out
-clobber:	clean
-destroy:
-	sh -c 'for i in *;do case $$i in RCS);; *) rm -f $$i;;esac;done;exit 0'
+all:	$(SOURCES) $(ALL)	; @echo 'Type "make run_tests"'
+clean:				; rm -f $(CLEAN)
+clobber:	clean		; rm -f $(ALL)
+destroy:			; $(DESTROY)
 sources:	$(SOURCES)
 lint.out:
 lincnt.out:
-run_tests:	$(SOURCES)	; sh -c '$@.sh 2>&1 | tee -a $@.out'
+run_tests:	$(SOURCES)	; $(RUN_TESTS)
 
 ####### (Details of Productions) ###############################################
 $(SOURCES):			; $(GET) $@
