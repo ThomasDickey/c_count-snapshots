@@ -3,6 +3,7 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		11 Jan 1999, add check for files w/o trailing newline.
  *		02 Jul 1998, add -w option, to set threshold for too-long
  *			     identifiers.  Implement check for mismatched
  *			     braces.
@@ -70,7 +71,7 @@
 #include "system.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.24 1998/07/02 23:44:40 tom Exp $";
+static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.25 1999/01/11 22:38:33 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -958,6 +959,13 @@ int	inFile (NO_ARGS)
 
 register int c = fgetc(File);
 
+	if (feof(File) || ferror(File)) {
+		c = EOF;
+		if (last_c != '\n')
+			One.flags_unasc++;
+	} else {
+		c &= 0xff;		/* protect against sign-extension bug */
+	}
 	if (One.chars_total == 0) {
 		bstate    = code;
 		old_block =
@@ -975,10 +983,6 @@ register int c = fgetc(File);
 		is_blank  = TRUE;
 	}
 
-	if (feof(File) || ferror(File))
-		c = EOF;
-	else
-		c &= 0xff;		/* protect against sign-extension bug */
 	if (c != EOF) {
 		if (verbose && (!One.chars_total || last_c == '\n'))
 			Summary(TRUE);
@@ -1066,8 +1070,8 @@ register int c = fgetc(File);
 				LVL_WEIGHT(1);
 			}
 		}
+		last_c = c;
 	}
-	last_c = c;
 	return (c);
 }
 
