@@ -1,5 +1,5 @@
 #ifndef	NO_IDENT
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.4 1994/07/18 01:42:26 tom Exp $";
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.8 1995/05/14 23:51:03 tom Exp $";
 #endif
 
 /*
@@ -7,6 +7,8 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		13 May 1995, split-off from td_lib.
+ *		28 Jul 1994, show totals even for empty file.
  *		17 Jul 1994, renamed from 'lincnt', for clearer meaning.
  *		23 Sep 1993, gcc warnings
  *		16 Oct 1991, header-label for spreadsheet had "STATEMENTS" and
@@ -31,7 +33,6 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
  *		17 Oct 1989, assume "//" begins C++ inline comments
  *		05 Oct 1989, lint (apollo SR10 "string" defs)
  *		21 Jul 1989, permit use of "-" to indicate standard input.
- *		15 Aug 1988, use 'vecalloc()' rather than 'malloc()'
  *		01 Jun 1988, added token-length statistic
  *		01 Jul 1987, test for junky files (i.e., non-ascii characters,
  *			     nested comments, non-graphic characters in
@@ -51,31 +52,59 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
  *		The file(s) are specified as command line arguments.  If no
  *		arguments are given, then the file is read from standard input.
  *
- * patch:	Make RCS-history filtering work with C++ comments.
+ * TODO:	Make RCS-history filtering work with C++ comments.
  *
- * patch:	Make RCS-history filtering smart enough to handle blank lines
+ * TODO:	Make RCS-history filtering smart enough to handle blank lines
  *		in the history-comments (as opposed to blank lines between
  *		successive revisions).
  */
 
-#ifdef	vms
-#define	DIR_PTYPES
+#include "system.h"
+
+#include <stdio.h>
+#include <ctype.h>
+
+#if HAVE_STDLIB_H
+#include <stdlib.h>
 #endif
 
-#define	STR_PTYPES
-#include	<ptypes.h>
-#include	<ctype.h>
-extern	int	optind;
-extern	char	*optarg;
+#if HAVE_MALLOC_H
+#include <malloc.h>
+#endif
+
+#if HAVE_STRING_H
+#include <string.h>
+#else
+#include <strings.h>
+#endif
+
+#if HAVE_GETOPT_H
+#include <getopt.h>
+#else
+extern	int getopt ARGS((int argc, char **argv, char *opts));
+extern	int optind;
+extern	char *optarg;
+#endif
+
+#if !HAVE_STRCHR		/* normally in <string.h> */
+#define strchr index
+#endif
+
+#ifndef EXIT_SUCCESS		/* normally in <stdlib.h> */
+#define EXIT_SUCCESS 0
+#define EXIT_FAILURE 0
+#endif
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
+
+#define PRINTF  (void)printf
 #define	DEBUG	if (debug) PRINTF
 #define	TOKEN(c)	((c) == '_' || isalnum(c))
 
-static	int	inFile(_ar0);
-static	int	Comment(_ar1(int, cpp));
-static	int	Escape(_ar0);
-static	int	String(_ar1(int, mark));
+static	int	inFile  ARGS((void));
+static	int	Comment ARGS((int cpp));
+static	int	Escape  ARGS((void));
+static	int	String  ARGS((int mark));
 
 static	FILE	*File;
 static	char	**quotvec;
@@ -125,6 +154,7 @@ static	int	verbose	= FALSE,/* TRUE iff we echo file, as processed */
 		opt_stat,
 		spreadsheet = FALSE,
 		cms_history,
+		files_total,
 		newsum;		/* TRUE iff we need a summary */
 
 static	char	*comma	= ",";
@@ -135,8 +165,8 @@ static	char	*dashes = "----------------";
  ************************************************************************/
 #ifdef	sun
 static	double	RoundUp(
-	_ARX(double,	value)
-	_AR1(double,	parts)
+	_ARG(double,	value),
+	_ARG(double,	parts)
 		)
 	_DCL(double,	value)
 	_DCL(double,	parts)
@@ -150,7 +180,7 @@ static	double	RoundUp(
 #endif
 
 static
-void	new_summary(_AR0)
+void	new_summary(NO_ARGS)
 {
 	if (!spreadsheet)
 		PRINTF ("\n");
@@ -158,9 +188,9 @@ void	new_summary(_AR0)
 
 static
 void	per_cent(
-	_ARX(char *,	text)
-	_ARX(long,	num)
-	_AR1(long,	den)
+	_ARG(char *,	text),
+	_ARG(long,	num),
+	_ARG(long,	den)
 		)
 	_DCL(char *,	text)
 	_DCL(long,	num)
@@ -175,13 +205,13 @@ void	per_cent(
 		value = 0.0;
 	else
 		value = RoundUp((num * 100.0) / den, 10.0);
-	PRINTF("%6ld\t%-24s %5.1f %%\n", num, text, value);
+	PRINTF("%6ld\t%-24s%6.1f %%\n", num, text, value);
 }
 
 static
 void	show_a_flag(
-	_ARX(char *,	text)
-	_AR1(long,	flag)
+	_ARG(char *,	text),
+	_ARG(long,	flag)
 		)
 	_DCL(char *,	text)
 	_DCL(long,	flag)
@@ -194,9 +224,9 @@ void	show_a_flag(
 
 static
 void	ratio(
-	_ARX(char *,	text)
-	_ARX(long,	num)
-	_AR1(long,	den)
+	_ARG(char *,	text),
+	_ARG(long,	num),
+	_ARG(long,	den)
 		)
 	_DCL(char *,	text)
 	_DCL(long,	num)
@@ -212,7 +242,7 @@ void	ratio(
 
 static
 void	summarize_lines(
-	_AR1(STATS *,	p))
+	_ARG(STATS *,	p))
 	_DCL(STATS *,	p)
 {
 	auto	long	den = p->lines_total;
@@ -236,7 +266,7 @@ void	summarize_lines(
 
 static
 void	summarize_chars(
-	_AR1(STATS *,	p))
+	_ARG(STATS *,	p))
 	_DCL(STATS *,	p)
 {
 	auto	long	den = p->chars_total;
@@ -258,7 +288,7 @@ void	summarize_chars(
 
 static
 void	summarize_names(
-	_AR1(STATS *,	p))
+	_ARG(STATS *,	p))
 	_DCL(STATS *,	p)
 {
 	new_summary();
@@ -276,7 +306,7 @@ void	summarize_names(
 
 static
 void	summarize_stats(
-	_AR1(STATS *,	p))
+	_ARG(STATS *,	p))
 	_DCL(STATS *,	p)
 {
 	new_summary();
@@ -288,7 +318,7 @@ void	summarize_stats(
 
 static
 void	show_totals(
-	_AR1(STATS *,	p))
+	_ARG(STATS *,	p))
 	_DCL(STATS *,	p)
 {
 	if (opt_line)	summarize_lines(p);
@@ -299,8 +329,8 @@ void	show_totals(
 
 static
 void	summarize(
-	_ARX(STATS *,	p)
-	_AR1(int,	mark)
+	_ARG(STATS *,	p),
+	_ARG(int,	mark)
 		)
 	_DCL(STATS *,	p)
 	_DCL(int,	mark)
@@ -326,7 +356,7 @@ void	summarize(
 
 static
 void	Summary(
-	_AR1(int,	mark))
+	_ARG(int,	mark))
 	_DCL(int,	mark)
 {
 	if (newsum)
@@ -336,7 +366,7 @@ void	Summary(
 #define	ADD(m)	All.m += One.m; One.m = 0
 
 static
-void	add_totals (_AR0)
+void	add_totals (NO_ARGS)
 {
 	ADD(chars_total);
 	ADD(chars_blank);
@@ -362,6 +392,7 @@ void	add_totals (_AR0)
 
 	ADD(words_total);
 	ADD(words_length);
+	files_total++;
 }
 
 /*
@@ -379,7 +410,7 @@ void	add_totals (_AR0)
  */
 static
 int	Token(
-	_AR1(int,	c))
+	_ARG(int,	c))
 	_DCL(int,	c)
 {
 	static	char	bfr[80];
@@ -431,29 +462,18 @@ int	Token(
  */
 static
 void	doFile (
-	_AR1(char *,	name))
+	_ARG(char *,	name))
 	_DCL(char *,	name)
 {
 	register int c;
 
-#ifdef	vms
-	if (vms_iswild(name)) {		/* expand wildcards */
-		auto	DIR		*dirp;
-		auto	struct	direct	*dp;
-		auto	char		pattern[BUFSIZ];
-
-		name = strcpy(pattern, name);
-		if (!strchr(name, ';'))
-			(void)strcat(name, ";");
-
-		if (dirp = opendir(name)) {
-			while (dp = readdir(dirp))
-				doFile(dp->d_name);
-			closedir(dirp);
-		} else {
-			perror(name);
-			exit(FAIL);
-		}
+#if !SYS_UNIX
+	if (has_wildcard(name)) {		/* expand wildcards? */
+		auto	char	expanded[BUFSIZ];
+		auto	int	count	= 0;
+		(void) strcpy(expanded, name);
+		while (expand_wildcard(expanded, !count++)
+			doFile(expanded);
 		return;
 	}
 #endif
@@ -509,7 +529,9 @@ void	doFile (
  * string (perhaps because the leading quote was in a macro!).
  */
 static
-int	String _ONE(int, mark)
+int	String (
+	_ARG(int, mark))
+	_DCL(int, mark)
 {
 	register int c = inFile();
 	char	*p = "@(#)";		/* permit literal tab here only! */
@@ -544,7 +566,7 @@ int	String _ONE(int, mark)
  * If we start with an octal digit, we may read up to OCTAL of these in a row.
  */
 static
-int	Escape (_AR0)
+int	Escape (NO_ARGS)
 {
 	register int c = inFile(),
 		digits = 0;
@@ -565,8 +587,8 @@ int	Escape (_AR0)
  */
 static
 void	Disregard(
-	_ARX(char *,	lo)
-	_AR1(char *,	hi)
+	_ARG(char *,	lo),
+	_ARG(char *,	hi)
 		)
 	_DCL(char *,	lo)
 	_DCL(char *,	hi)
@@ -580,6 +602,33 @@ void	Disregard(
 	}
 	One.lines_notes -= 1;
 	One.lines_rlogs += 1;
+}
+
+/*
+ * Compare strings ignoring blanks (TD_LIB)
+ */
+#define	SKIP(p)	while (isspace(*p))	p++;
+
+static
+int	strbcmp(
+	_ARG(register char *,	a),
+	_ARG(register char *,	b)
+		)
+	_DCL(register char *,	a)
+	_DCL(register char *,	b)
+{
+	register int	cmp;
+
+	while (*a && *b) {
+		if (isspace(*a) && isspace(*b)) {
+			SKIP(a);
+			SKIP(b);
+		} else if ((cmp = (*a++ - *b++)) != EOS)
+			return (cmp);
+	}
+	SKIP(a);
+	SKIP(b);
+	return (*a - *b);
 }
 
 /*
@@ -598,7 +647,7 @@ void	Disregard(
  */
 static
 int	filter_history(
-	_AR1(int,	first))
+	_ARG(int,	first))
 	_DCL(int,	first)
 {
 	enum	HSTATE	{unknown, cms, rlog, revision, contents};
@@ -684,7 +733,7 @@ int	filter_history(
  */
 static
 int	Comment (
-	_AR1(int,	c_plus_plus))
+	_ARG(int,	c_plus_plus))
 	_DCL(int,	c_plus_plus)
 {
 	register int	c;
@@ -730,7 +779,7 @@ int	Comment (
  * pointer.
  */
 static
-int	inFile (_AR0)
+int	inFile (NO_ARGS)
 {
 	static	int	last_c;
 	static	int	is_blank;	/* true til we get nonblank on line */
@@ -761,11 +810,7 @@ register int c = fgetc(File);
 			One.flags_unasc++;
 		}
 		if (verbose) {
-#ifdef	putc
-			c = putchar((unsigned char)c);
-#else
 			c = putchar(c);
-#endif
 		}
 		One.chars_total++;
 		if (c == '#' && is_blank)
@@ -821,7 +866,7 @@ register int c = fgetc(File);
 }
 
 static
-void	usage(_AR0)
+void	usage(NO_ARGS)
 {
 	static	char	*tbl[] = {
  "Usage: c_count [options] [files]"
@@ -845,8 +890,8 @@ void	usage(_AR0)
 	};
 	register int	j;
 	for (j = 0; j < sizeof(tbl)/sizeof(tbl[0]); j++)
-		FPRINTF(stderr, "%s\n", tbl[j]);
-	(void)exit(FAIL);
+		(void)fprintf(stderr, "%s\n", tbl[j]);
+	(void)exit(EXIT_FAILURE);
 }
 
 /************************************************************************
@@ -854,13 +899,18 @@ void	usage(_AR0)
  ************************************************************************/
 
 /*ARGSUSED*/
-_MAIN
+int	main (
+	_ARG(int,	argc),
+	_ARG(char **,	argv)
+		)
+	_DCL(int,	argc)
+	_DCL(char **,	argv)
 {
 	register int j;
 	auto	char	name[BUFSIZ];
 	auto	int	opt_all = -1;
 
-	quotvec = vecalloc((unsigned)(argc * sizeof(char *)));
+	quotvec = typeCalloc(char *, (size_t)argc);
 	while ((j = getopt(argc,argv,"cdijlo:pq:stv")) != EOF) switch(j) {
 	case 'l':	opt_all = FALSE; opt_line = TRUE; break;
 	case 'c':	opt_all = FALSE; opt_char = TRUE; break;
@@ -924,11 +974,13 @@ _MAIN
 	if (optind < argc) {
 		for (j = optind; j < argc; j++)
 			doFile (argv[j]);
+	} else {
+		while (gets(name)) {
+			doFile (name);
+		}
 	}
-	else while (gets(name))
-		doFile (name);
 
-	if (!spreadsheet && All.chars_total) {
+	if (!spreadsheet && files_total) {
 		if (!per_file) {
 			PRINTF ("%s\n", dashes);
 			summarize(&All,FALSE);
@@ -943,6 +995,6 @@ _MAIN
 		show_totals(&All);
 		PRINTF("\n");
 	}
-	(void)exit(SUCCESS);
+	(void)exit(EXIT_SUCCESS);
 	/*NOTREACHED*/
 }
