@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.3 86/10/07 13:35:08";
+static	char	Id[] = "@(#)lincnt.c	1.4 86/10/08 12:09:09";
 #endif	lint
 
 /*
@@ -16,15 +16,22 @@ static	char	Id[] = "@(#)lincnt.c	1.3 86/10/07 13:35:08";
  *		arguments are given, then the file is read from standard input.
  */
 
+#include	<syscap.h>
+
 #include	<stdio.h>
 #include	<ctype.h>
+
+#ifdef	SYS3_LLIB
+extern	int	exit();
+#else
 extern	void	exit();
+#endif
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	TRUE	1
 #define	FALSE	0
 #define	PRINTF	(void) printf
-#define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*n)/tot_chars);
+#define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*((double)n))/((double)tot_chars));
 
 static	FILE	*File;
 
@@ -53,15 +60,16 @@ char	name[256];
 	if (tot_chars) {
 		PRINTF ("--------\n");
 		PRINTF ("%8d characters", tot_chars);
-		if (tot_white || tot_notes) {
+		if ((tot_white != 0L) || (tot_notes != 0L)) {
 			PRINTF (" (");
 			if (tot_white)	PERCENT(tot_white,whitespace);
 			if (tot_white && tot_notes) PRINTF(", ");
 			if (tot_notes)	PERCENT(tot_notes,comment);
 			PRINTF(")");
-			if (tot_stmts && tot_notes)
-				PRINTF (": %.2f", (tot_notes*1.)
-					/(tot_chars-tot_white-tot_notes));
+			if (tot_stmts && tot_notes) {
+			long	bot_ratio = (tot_chars - tot_white - tot_notes);
+				PRINTF (": %.2f", (tot_notes*1.) / bot_ratio);
+			}
 		}
 		PRINTF("\n");
 		PRINTF ("%8d lines\n", tot_lines);
