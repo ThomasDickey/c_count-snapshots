@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.9 87/08/28 17:11:43";
+static	char	Id[] = "@(#)lincnt.c	1.10 88/06/01 07:08:10";
 #endif	lint
 
 /*
@@ -7,6 +7,7 @@ static	char	Id[] = "@(#)lincnt.c	1.9 87/08/28 17:11:43";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		01 Jun 1988, added token-length statistic
  *		01 Jul 1987, test for junky files (i.e., non-ascii characters,
  *			     nested comments, non-graphic characters in quotes),
  *			     added '-v' verbose mode to show running totals &
@@ -26,24 +27,21 @@ static	char	Id[] = "@(#)lincnt.c	1.9 87/08/28 17:11:43";
  *		arguments are given, then the file is read from standard input.
  */
 
-#include	<ptypes.h>
+#include	"ptypes.h"
 
 #include	<stdio.h>
 #include	<ctype.h>
 extern	int	optind;
 extern	char	*optarg, *malloc();
 
-#ifdef	SYS3_LLIB
-extern	int	exit();
-#else
-extern	void	exit();
-#endif
-
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	TRUE	1
 #define	FALSE	0
+#define	EOS	'\0'
 #define	PRINTF	(void) printf
+#define	DEBUG	if (debug) PRINTF
 #define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*((double)n))/((double)tot_chars));
+#define	TOKEN(c)	((c) == '_' || isalnum(c))
 
 static	FILE	*File;
 static	char	**quotvec;
@@ -52,6 +50,8 @@ static	int	literal;
 				/* Running totals: */
 static	long	tot_chars = 0,	/* # of characters */
 		tot_lines = 0,	/* # of lines	   */
+		tot_words = 0,	/* # of identifiers */
+		len_words = 0,	/* # of chars in identifiers */
 		tot_stmts = 0,	/* # of statements */
 		tot_unasc = 0,	/* # of illegal (nongraphic) characters */
 		tot_unquo = 0,	/* # of unbalanced quotes (line) */
@@ -111,6 +111,9 @@ char	name[256];
 			}
 		}
 		PRINTF("\n");
+		if (tot_words)
+			PRINTF ("%8ld tokens, average length %.2f\n",
+				tot_words, (1.0 * len_words) / tot_words);
 		PRINTF ("%8ld lines\n", tot_lines);
 		PRINTF ("%8ld statements\n", tot_stmts);
 		if (tot_unasc)
@@ -152,7 +155,7 @@ register int c;
 	while (c != EOF) {
 		switch (c) {
 		case '/':
-			c = Token(0);
+			c = Token(EOS);
 			if (c == '*') c = Comment();
 			break;
 		case '"':
@@ -165,7 +168,7 @@ register int c;
 			c = Token(c);
 		}
 	}
-	(void)Token(0);
+	(void)Token(EOS);
 	if (verbose) {
 		unquo = num_unquo;
 		uncmt = num_uncmt;
@@ -217,29 +220,42 @@ static	int	len = 0;
 register int	j = 0;
 
 	if (quotdef) {
-		while (isalnum(c) || c == '_') {
+		tot_words++;
+		while (TOKEN(c)) {
+			len_words++;
 			if (len < sizeof(bfr)-1) bfr[len++] = c;
 			c = inFile();
 			j++;
 		}
 		if (len) {
 			if (c == ' ' || c == '\t' || c == '(') {
-				bfr[len] = 0;
+				bfr[len] = EOS;
 				for (j = 0; j < quotdef; j++) {
 					if (!strcmp(quotvec[j],bfr)) {
 						c = String('"');
-						if (debug) PRINTF("**%c**",c);
+						DEBUG("**%c**",c);
 						break;
 					}
 				}
-				if (debug) PRINTF("%s\n", bfr);
+				DEBUG("%s\n", bfr);
 			}
 			len = 0;
 		} else if (!j)
 			c = inFile();
 		bfr[len] = 0;
-	} else
-		c = inFile();
+	} else {
+		if (TOKEN(c)) {
+			tot_words++;
+			DEBUG("'");
+			do {
+				len_words++;
+				DEBUG("%c", c);
+				c = inFile();
+			} while (TOKEN(c));
+			DEBUG("'\n");
+		} else	/* punctuation */
+			c = inFile();
+	}
 	return(c);
 }
 
