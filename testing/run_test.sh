@@ -1,7 +1,7 @@
 #!/bin/sh
-# $Id: run_test.sh,v 7.1 1994/07/18 01:29:03 tom Exp $
+# $Id: run_test.sh,v 7.2 1995/05/14 21:13:53 tom Exp $
 #
-PROG=../bin/c_count
+PROG=../c_count
 TMP=/tmp/c_count$$
 rm -f $TMP
 #

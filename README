@@ -1,8 +1,12 @@
-$Id: README,v 7.1 1994/07/18 01:17:28 tom Exp $
+$Id: README,v 7.2 1995/05/14 00:44:12 tom Exp $
 
 --------------------------------------------------------------------------------
 
 -- Author: T.E.Dickey
 
-C_COUNT counts C-language source statements, and summarizes statistics
-about the relative amount of commentary, illegal characters, etc.
+C_COUNT counts C-language source statements, and summarizes statistics about
+the relative amount of commentary, whitespace, etc.
+
+It provides options to extend its usefulness, accommodating C-preprocessor
+definitions that would confuse a simpler line-counter, and for displaying
+non-graphic characters, etc.

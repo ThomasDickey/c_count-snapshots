@@ -1,8 +1,5 @@
-# $Id: Makefile,v 7.1 1994/07/18 01:27:49 tom Exp $
+# $Id: Makefile,v 7.2 1995/05/14 21:16:12 tom Exp $
 # make-file for testing C_COUNT
-
-TOP	= ../..
-include $(TOP)/td_lib/support/td_lib.mk
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
@@ -26,13 +23,9 @@ TST_FILES = \
 SOURCES	= Makefile descrip.mms README $(SCRIPTS) $(REF_FILES) $(TST_FILES)
 
 ####### (Standard Productions) #################################################
-all:	$(SOURCES) $(ALL)	; @echo 'Type "make run_test"'
-clean:				; rm -f $(CLEAN)
-clobber:	clean		; rm -f $(ALL)
-destroy:			; $(DESTROY)
-sources:	$(SOURCES)
-lint.out:
-run_test:	$(SOURCES)	; $(RUN_TESTS)
+all:
 
-####### (Details of Productions) ###############################################
-$(SOURCES):			; $(GET) $@
+clean:	
+	-rm -f *.log
+run_test:
+	./run_test.sh 
