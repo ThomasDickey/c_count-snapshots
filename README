@@ -1,4 +1,9 @@
-$Id: README,v 3.0 1989/10/02 08:00:42 ste_cm Rel $
+$Id: README,v 7.0 1990/08/30 13:07:22 ste_cm Rel $
+
+--------------------------------------------------------------------------------
+	-- Software Productivty Consortium
+	-- Version: 01.00.00
+	-- Author: T.E.Dickey
 
 LINCNT counts C-language source statements, and summarizes statistics
 about the relative amount of commentary, illegal characters, etc.
