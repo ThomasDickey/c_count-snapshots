@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t19940718
+MANIFEST for c_count, version t19940913
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 COPYING                         copyright notice for C_COUNT
@@ -7,6 +7,7 @@ c_count.1                       manual-page for C_COUNT
 c_count.c                       C_COUNT main program
 config_h.in                     template for config.h
 descrip.mms                     VMS build-script for C_COUNT
+install.sh                      install-script from X11
 mkdirs.sh                       mkinstalldirs script (renamed for porting)
 testing                         subdirectory
 testing/Makefile                makefile for C_COUNT test-directory
