@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.7 87/07/01 11:20:12";
+static	char	Id[] = "@(#)lincnt.c	1.8 87/07/28 08:26:57";
 #endif	lint
 
 /*
@@ -26,7 +26,7 @@ static	char	Id[] = "@(#)lincnt.c	1.7 87/07/01 11:20:12";
  *		arguments are given, then the file is read from standard input.
  */
 
-#include	<syscap.h>
+#include	<ptypes.h>
 
 #include	<stdio.h>
 #include	<ctype.h>
