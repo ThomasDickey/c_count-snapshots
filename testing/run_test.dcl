@@ -1,11 +1,11 @@
-$! $Id: run_test.dcl,v 7.0 1991/10/22 08:21:36 ste_cm Rel $
+$! $Id: run_test.dcl,v 7.1 1994/07/18 01:28:14 tom Exp $
 $	verify = F$VERIFY(0)
 $	set := set
 $	set symbol/scope=(nolocal,noglobal)
 $	path = F$ENVIRONMENT("procedure")
 $	path = F$EXTRACT(0,F$LOCATE("]",path)+1,path)
-$	prog = "$ ''F$EXTRACT(0,F$LENGTH(path)-1,path)'.-.bin]lincnt"
-$	temp = "sys$scratch:lincnt.tmp"
+$	prog = "$ ''F$EXTRACT(0,F$LENGTH(path)-1,path)'.-.bin]C_COUNT"
+$	temp = "sys$scratch:C_COUNT.tmp"
 $	call remove 'temp
 $
 $	type sys$input
@@ -41,7 +41,7 @@ $	type sys$input
 **	Case 4:	Counting bulk text piped in standard-input:
 $	eod
 $
-$	pipe = "sys$scratch:lincnt.tst"
+$	pipe = "sys$scratch:C_COUNT.tst"
 $	call   remove  'pipe
 $	copy   test1.c 'pipe
 $	append test2.c 'pipe;
@@ -79,7 +79,7 @@ $	exit
 $
 $ display: subroutine
 $	test = "''path'''p1'.ref"
-$	list = "sys$scratch:lincnt.dif"
+$	list = "sys$scratch:C_COUNT.dif"
 $	diff/output='list 'temp 'test
 $	if $severity .ne. 1
 $	then

@@ -1,12 +1,13 @@
 #ifndef	NO_IDENT
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.2 1993/11/29 01:16:36 dickey Exp $";
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.4 1994/07/18 01:42:26 tom Exp $";
 #endif
 
 /*
- * Title:	lincnt.c
+ * Title:	c_count.c
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		17 Jul 1994, renamed from 'lincnt', for clearer meaning.
  *		23 Sep 1993, gcc warnings
  *		16 Oct 1991, header-label for spreadsheet had "STATEMENTS" and
  *			     "LINES" interchanged (fixed).  Also, converted to
@@ -133,7 +134,7 @@ static	char	*dashes = "----------------";
  *	local procedures						*
  ************************************************************************/
 #ifdef	sun
-static	double	roundup(
+static	double	RoundUp(
 	_ARX(double,	value)
 	_AR1(double,	parts)
 		)
@@ -145,7 +146,7 @@ static	double	roundup(
 		return (temp / (parts * 10.0));
 	}
 #else
-#define	roundup(value,parts)	value
+#define	RoundUp(value,parts)	value
 #endif
 
 static
@@ -167,13 +168,13 @@ void	per_cent(
 {
 	double	value;
 	if (spreadsheet) {
-		PRINTF("%d%s", num, comma);
+		PRINTF("%ld%s", num, comma);
 		return;
 	}
 	if (num == 0 || den == 0)
 		value = 0.0;
 	else
-		value = roundup((num * 100.0) / den, 10.0);
+		value = RoundUp((num * 100.0) / den, 10.0);
 	PRINTF("%6ld\t%-24s %5.1f %%\n", num, text, value);
 }
 
@@ -652,8 +653,8 @@ int	filter_history(
 			while ((d = strchr(s, 'R')) != NULL) {
 				s = d + 1;
 				if (!strncmp(d, "Revision", 8)) {
-					size_t len = (size_t)(d-buffer);
-					strcpy(prefix, buffer)[len] = EOS;
+					size_t len2 = (size_t)(d-buffer);
+					strcpy(prefix, buffer)[len2] = EOS;
 					hstate = revision;
 					s += strlen(s);
 					Disregard(d,s-2);
@@ -823,7 +824,7 @@ static
 void	usage(_AR0)
 {
 	static	char	*tbl[] = {
- "Usage: lincnt [options] [files]"
+ "Usage: c_count [options] [files]"
 ,""
 ,"If no files are specified as arguments, a list of filenames is read from the"
 ,"standard input.  The special name \"-\" denotes a file which is read from the"
@@ -837,7 +838,7 @@ void	usage(_AR0)
 ," -l        line-statistics"
 ," -o file   specify alternative output-file"
 ," -p        per-file statistics"
-," -q DEFINE tells lincnt that the given name is an unbalanced quote"
+," -q DEFINE tells c_count that the given name is an unbalanced quote"
 ," -s        specialized statistics"
 ," -t        generate output for spreadsheet"
 ," -v        verbose (shows lines as they are counted)"

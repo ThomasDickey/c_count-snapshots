@@ -1,9 +1,8 @@
-$Id: README,v 7.0 1990/08/30 13:07:22 ste_cm Rel $
+$Id: README,v 7.1 1994/07/18 01:17:28 tom Exp $
 
 --------------------------------------------------------------------------------
-	-- Software Productivty Consortium
-	-- Version: 01.00.00
-	-- Author: T.E.Dickey
 
-LINCNT counts C-language source statements, and summarizes statistics
+-- Author: T.E.Dickey
+
+C_COUNT counts C-language source statements, and summarizes statistics
 about the relative amount of commentary, illegal characters, etc.
