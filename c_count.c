@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 2.0 1990/05/10 16:01:43 ste_cm Rel $";
+static	char	Id[] = "$Id: c_count.c,v 2.1 1990/05/14 16:34:06 dickey Exp $";
 #endif	lint
 
 /*
@@ -7,9 +7,12 @@ static	char	Id[] = "$Id: c_count.c,v 2.0 1990/05/10 16:01:43 ste_cm Rel $";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 2.0  1990/05/10 16:01:43  ste_cm
- * BASELINE Fri May 11 10:36:36 1990
+ * Revision 2.1  1990/05/14 16:34:06  dickey
+ * added "-t" (spreadsheet/table) option
  *
+ *		Revision 2.0  90/05/10  16:01:43  ste_cm
+ *		BASELINE Fri May 11 10:36:36 1990
+ *		
  *		Revision 1.19  90/05/10  16:01:43  dickey
  *		ported to VAX/VMS 5.3 (expand wildcards, added "-o" option).
  *		made usage-message more verbose
@@ -88,6 +91,7 @@ static	long	num_unquo, unquo,/* per-file, for running totals */
 static	int	verbose	= FALSE,/* TRUE iff we echo file, as processed */
 		quotdef	= 0,	/* number of tokens we treat as '"' */
 		debug	= FALSE,
+		tbl_opt	= FALSE,
 		newsum;		/* TRUE iff we need a summary */
 
 main (argc, argv)
@@ -98,7 +102,7 @@ register int j;
 char	name[256];
 
 	quotvec = vecalloc((unsigned)(argc * sizeof(char *)));
-	while ((j = getopt(argc,argv,"dvo:q:")) != EOF) switch(j) {
+	while ((j = getopt(argc,argv,"dvo:q:t")) != EOF) switch(j) {
 	case 'd':	debug	= TRUE;
 			break;
 	case 'v':	verbose = TRUE;
@@ -108,8 +112,13 @@ char	name[256];
 			break;
 	case 'q':	quotvec[quotdef++] = optarg;
 			break;
+	case 't':	tbl_opt = TRUE;
+			break;
 	default:	usage();
 	}
+
+	if (tbl_opt)
+		PRINTF("STATEMENTS,LINES,FILENAME\n");
 
 	if (optind < argc) {
 		for (j = optind; j < argc; j++)
@@ -118,7 +127,7 @@ char	name[256];
 	else while (gets(name))
 		doFile (name);
 
-	if (tot_chars) {
+	if (!tbl_opt && tot_chars) {
 		PRINTF ("--------\n");
 		PRINTF ("%8ld characters", tot_chars);
 		if ((tot_white != 0L) || (tot_notes != 0L)) {
@@ -163,9 +172,10 @@ usage()
 ,""
 ,"Options:"
 ," -d        debug (shows tokens as they are parsed)"
-," -v        verbose (shows lines as they are counted)"
 ," -o file   specify alternative output-file"
 ," -q DEFINE tells lincnt that the given name is an unbalanced quote"
+," -t        generate output for spreadsheet"
+," -v        verbose (shows lines as they are counted)"
 	};
 	register int	j;
 	for (j = 0; j < sizeof(tbl)/sizeof(tbl[0]); j++)
@@ -256,11 +266,17 @@ Summary()
 {
 	if (newsum) {
 		newsum = FALSE;
-		PRINTF ("%6ld %5ld%c%c%c|",
-			tot_lines-num_lines, tot_stmts-num_stmts,
-			(unasc ? '?' : ' '),
-			(unquo ? '"' : ' '),
-			(uncmt ? '*' : ' '));
+		if (tbl_opt) {
+			PRINTF ("%ld,%ld,",
+				tot_lines - num_lines,
+				tot_stmts - num_stmts);
+		} else {
+			PRINTF ("%6ld %5ld%c%c%c|",
+				tot_lines-num_lines, tot_stmts-num_stmts,
+				(unasc ? '?' : ' '),
+				(unquo ? '"' : ' '),
+				(uncmt ? '*' : ' '));
+		}
 		num_unasc += unasc; unasc = 0;
 		num_unquo += unquo; unquo = 0;
 		num_uncmt += uncmt; uncmt = 0;
