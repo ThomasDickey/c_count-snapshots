@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: run_test.sh,v 5.0 1990/08/30 08:02:54 ste_cm Rel $
+# $Id: run_test.sh,v 6.0 1991/10/21 16:06:48 ste_cm Rel $
 #
 PROG=../bin/lincnt
 TMP=/tmp/lincnt$$
@@ -43,5 +43,20 @@ cat <<EOF/
 EOF/
 $PROG test3.c >$TMP
 ./show_diffs.sh $TMP history.ref
+#
+cat <<EOF/
+**
+**	Case 6:	Display as a spreadsheet
+EOF/
+$PROG -t -qLEFT test[123].c >$TMP
+./show_diffs.sh $TMP table.ref
+#
+cat <<EOF/
+**
+**	Case 7:	Display as a spreadsheet (per-file)
+EOF/
+$PROG -pt -qLEFT test[123].c >$TMP
+./show_diffs.sh $TMP table_p.ref
+#
 #
 rm -f $TMP

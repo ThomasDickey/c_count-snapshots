@@ -1,8 +1,9 @@
-MANIFEST for c_count, version t19911016
+MANIFEST for c_count, version t19911021
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 COPYING                         copyright notice for C_COUNT
 README                          brief description of C_COUNT
+c_count.1                       manual-page for C_COUNT
 c_count.c                       C_COUNT main program
 descrip.mms                     VMS build-script for C_COUNT
 testing                         subdirectory
@@ -18,6 +19,8 @@ testing/quotes.ref              reference (output from unbalanced-quote test)
 testing/run_test.dcl            VMS test-script for C_COUNT
 testing/run_test.sh             UNIX test-script for C_COUNT
 testing/showdiff.sh             perform reference-comparison for 'run_tests.sh'
+testing/table.ref               reference (spreadsheet/tabular output)
+testing/table_p.ref             reference (output from per-file table)
 testing/test1.c                 test-file (unbalanced quote via #define)
 testing/test2.c                 test-file (embedded tab)
 testing/test3.c                 test-file for RCS-history
