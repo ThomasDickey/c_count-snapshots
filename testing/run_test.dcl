@@ -1,5 +1,7 @@
-$! $Id: run_test.dcl,v 2.0 1990/05/11 09:45:05 ste_cm Rel $
+$! $Id: run_test.dcl,v 3.0 1990/06/08 13:20:28 ste_cm Rel $
 $	verify = F$VERIFY(0)
+$	set := set
+$	set symbol/scope=(nolocal,noglobal)
 $	path = F$ENVIRONMENT("procedure")
 $	path = F$EXTRACT(0,F$LOCATE("]",path)+1,path)
 $	prog = "$ ''F$EXTRACT(0,F$LENGTH(path)-1,path)'.-.bin]lincnt"
@@ -65,10 +67,10 @@ $ endsubroutine
 $
 $ remove: subroutine
 $	set noon
-$ nomsg
+$	set message/noident/notext/nosever/nofacil
 $	set file/protection=(o:rwed) 'p1;*
 $	delete 'p1;*
-$ msg
+$	set message/ident/text/sever/facil
 $	set on
 $	return
 $ endsubroutine
