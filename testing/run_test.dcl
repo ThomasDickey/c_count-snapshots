@@ -1,4 +1,4 @@
-$! $Id: run_test.dcl,v 5.1 1991/10/21 16:33:18 dickey Exp $
+$! $Id: run_test.dcl,v 7.0 1991/10/22 08:21:36 ste_cm Rel $
 $	verify = F$VERIFY(0)
 $	set := set
 $	set symbol/scope=(nolocal,noglobal)
@@ -64,14 +64,14 @@ $	type sys$input
 **
 **	Case 6:	Display as a spreadsheet
 $	eod
-$	prog -o 'temp -t -qLEFT test1.c test2.c test3.c
+$	prog -o 'temp -t -q"LEFT" test1.c test2.c test3.c
 $	call display table
 $
 $	type sys$input
 **
 **	Case 7:	Display as a spreadsheet (per-file)
 $	eod
-$	prog -o 'temp -pt -qLEFT test1.c test2.c test3.c
+$	prog -o 'temp -pt -q"LEFT" test1.c test2.c test3.c
 $	call display table_p
 $
 $	verify = F$VERIFY(0)
