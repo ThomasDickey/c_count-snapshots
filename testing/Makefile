@@ -1,13 +1,13 @@
-# $Id: Makefile,v 6.1 1992/10/19 08:35:46 dickey Exp $
+# $Id: Makefile,v 7.0 1993/04/28 09:40:00 ste_cm Rel $
 # make-file for testing LINCNT
 
 TOP	= ../..
-include $(TOP)/cm_library/support/cm_library.mk
+include $(TOP)/td_lib/support/td_lib.mk
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
-	run_tests.sh	run_tests.com\
-	show_diffs.sh
+	run_test.sh	run_test.com\
+	showdiff.sh
 
 REF_FILES = \
 	cat.ref \
@@ -26,14 +26,14 @@ TST_FILES = \
 SOURCES	= Makefile descrip.mms README $(SCRIPTS) $(REF_FILES) $(TST_FILES)
 
 ####### (Standard Productions) #################################################
-all:	$(SOURCES) $(ALL)	; @echo 'Type "make run_tests"'
+all:	$(SOURCES) $(ALL)	; @echo 'Type "make run_test"'
 clean:				; rm -f $(CLEAN)
 clobber:	clean		; rm -f $(ALL)
 destroy:			; $(DESTROY)
 sources:	$(SOURCES)
 lint.out:
 lincnt.out:
-run_tests:	$(SOURCES)	; $(RUN_TESTS)
+run_test:	$(SOURCES)	; $(RUN_TESTS)
 
 ####### (Details of Productions) ###############################################
 $(SOURCES):			; $(GET) $@
