@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.0 1991/10/21 16:03:48 ste_cm Rel $";
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.1 1993/09/23 19:01:59 dickey Exp $";
 #endif
 
 /*
@@ -7,6 +7,7 @@ static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		23 Sep 1993, gcc warnings
  *		16 Oct 1991, header-label for spreadsheet had "STATEMENTS" and
  *			     "LINES" interchanged (fixed).  Also, converted to
  *			     ANSI.
@@ -70,6 +71,11 @@ extern	char	*optarg;
 #define	DEBUG	if (debug) PRINTF
 #define	TOKEN(c)	((c) == '_' || isalnum(c))
 
+static	int	inFile(_ar0);
+static	int	Comment(_ar1(int, cpp));
+static	int	Escape(_ar0);
+static	int	String(_ar1(int, mark));
+
 static	FILE	*File;
 static	char	**quotvec;
 
@@ -104,7 +110,7 @@ static	long	old_unquo,
 		old_unasc,
 		old_uncmt;
 
-typedef	enum	PSTATE	{code, comment, preprocessor};
+enum	PSTATE	{code, comment, preprocessor};
 static	enum	PSTATE	pstate;
 
 static	int	verbose	= FALSE,/* TRUE iff we echo file, as processed */
@@ -143,21 +149,21 @@ static	double	roundup(
 #endif
 
 static
-new_summary(_AR0)
+void	new_summary(_AR0)
 {
 	if (!spreadsheet)
 		PRINTF ("\n");
 }
 
 static
-per_cent(
-_ARX(char *,	text)
-_ARX(long,	num)
-_AR1(long,	den)
-	)
-_DCL(char *,	text)
-_DCL(long,	num)
-_DCL(long,	den)
+void	per_cent(
+	_ARX(char *,	text)
+	_ARX(long,	num)
+	_AR1(long,	den)
+		)
+	_DCL(char *,	text)
+	_DCL(long,	num)
+	_DCL(long,	den)
 {
 	double	value;
 	if (spreadsheet) {
@@ -172,12 +178,12 @@ _DCL(long,	den)
 }
 
 static
-show_a_flag(
-_ARX(char *,	text)
-_AR1(long,	flag)
-	)
-_DCL(char *,	text)
-_DCL(long,	flag)
+void	show_a_flag(
+	_ARX(char *,	text)
+	_AR1(long,	flag)
+		)
+	_DCL(char *,	text)
+	_DCL(long,	flag)
 {
 	if (spreadsheet)
 		PRINTF("%ld%s", flag, comma);
@@ -186,14 +192,14 @@ _DCL(long,	flag)
 }
 
 static
-ratio(
-_ARX(char *,	text)
-_ARX(long,	num)
-_AR1(long,	den)
-	)
-_DCL(char *,	text)
-_DCL(long,	num)
-_DCL(long,	den)
+void	ratio(
+	_ARX(char *,	text)
+	_ARX(long,	num)
+	_AR1(long,	den)
+		)
+	_DCL(char *,	text)
+	_DCL(long,	num)
+	_DCL(long,	den)
 {
 	if (den == 0) den = 1;
 	if (spreadsheet) {
@@ -204,9 +210,9 @@ _DCL(long,	den)
 }
 
 static
-summarize_lines(
-_AR1(STATS *,	p))
-_DCL(STATS *,	p)
+void	summarize_lines(
+	_AR1(STATS *,	p))
+	_DCL(STATS *,	p)
 {
 	auto	long	den = p->lines_total;
 
@@ -228,9 +234,9 @@ _DCL(STATS *,	p)
 }
 
 static
-summarize_chars(
-_AR1(STATS *,	p))
-_DCL(STATS *,	p)
+void	summarize_chars(
+	_AR1(STATS *,	p))
+	_DCL(STATS *,	p)
 {
 	auto	long	den = p->chars_total;
 
@@ -250,9 +256,9 @@ _DCL(STATS *,	p)
 }
 
 static
-summarize_names(
-_AR1(STATS *,	p))
-_DCL(STATS *,	p)
+void	summarize_names(
+	_AR1(STATS *,	p))
+	_DCL(STATS *,	p)
 {
 	new_summary();
 	if (spreadsheet) {
@@ -268,9 +274,9 @@ _DCL(STATS *,	p)
 }
 
 static
-summarize_stats(
-_AR1(STATS *,	p))
-_DCL(STATS *,	p)
+void	summarize_stats(
+	_AR1(STATS *,	p))
+	_DCL(STATS *,	p)
 {
 	new_summary();
 	ratio("comment:code", p->chars_notes, p->chars_prepro + p->chars_code);
@@ -280,9 +286,9 @@ _DCL(STATS *,	p)
 }
 
 static
-show_totals(
-_AR1(STATS *,	p))
-_DCL(STATS *,	p)
+void	show_totals(
+	_AR1(STATS *,	p))
+	_DCL(STATS *,	p)
 {
 	if (opt_line)	summarize_lines(p);
 	if (opt_char)	summarize_chars(p);
@@ -291,12 +297,12 @@ _DCL(STATS *,	p)
 }
 
 static
-summarize(
-_ARX(STATS *,	p)
-_AR1(int,	mark)
-	)
-_DCL(STATS *,	p)
-_DCL(int,	mark)
+void	summarize(
+	_ARX(STATS *,	p)
+	_AR1(int,	mark)
+		)
+	_DCL(STATS *,	p)
+	_DCL(int,	mark)
 {
 	newsum = FALSE;
 	if (spreadsheet) {
@@ -318,9 +324,9 @@ _DCL(int,	mark)
 }
 
 static
-Summary(
-_AR1(int,	mark))
-_DCL(int,	mark)
+void	Summary(
+	_AR1(int,	mark))
+	_DCL(int,	mark)
 {
 	if (newsum)
 		summarize(&One,mark);
@@ -329,7 +335,7 @@ _DCL(int,	mark)
 #define	ADD(m)	All.m += One.m; One.m = 0
 
 static
-add_totals (_AR0)
+void	add_totals (_AR0)
 {
 	ADD(chars_total);
 	ADD(chars_blank);
@@ -371,13 +377,13 @@ add_totals (_AR0)
  * be expanded there, e.g., if it is followed by a space or tab.
  */
 static
-Token(
-_AR1(int,	c))
-_DCL(int,	c)
+int	Token(
+	_AR1(int,	c))
+	_DCL(int,	c)
 {
-static	char	bfr[80];
-static	int	len = 0;
-register int	j = 0;
+	static	char	bfr[80];
+	static	int	len = 0;
+	register int	j = 0;
 
 	if (quotdef) {
 		One.words_total++;
@@ -423,11 +429,11 @@ register int	j = 0;
  * Process a single file:
  */
 static
-doFile (
-_AR1(char *,	name))
-_DCL(char *,	name)
+void	doFile (
+	_AR1(char *,	name))
+	_DCL(char *,	name)
 {
-register int c;
+	register int c;
 
 #ifdef	vms
 	if (vms_iswild(name)) {		/* expand wildcards */
@@ -502,12 +508,10 @@ register int c;
  * string (perhaps because the leading quote was in a macro!).
  */
 static
-String (
-_AR1(int,	mark))
-_DCL(int,	mark)
+int	String _ONE(int, mark)
 {
-register int c = inFile();
-char	*p = "@(#)";			/* permit literal tab here only! */
+	register int c = inFile();
+	char	*p = "@(#)";		/* permit literal tab here only! */
 
 	literal = TRUE;
 	while (c != EOF) {
@@ -539,11 +543,10 @@ char	*p = "@(#)";			/* permit literal tab here only! */
  * If we start with an octal digit, we may read up to OCTAL of these in a row.
  */
 static
-int
-Escape (_AR0)
+int	Escape (_AR0)
 {
-register int c = inFile(),
-	digits = 0;
+	register int c = inFile(),
+		digits = 0;
 
 	if (c != EOF) {
 		while (c >= '0' && c <= '7' && digits < OCTAL) {
@@ -560,12 +563,12 @@ register int c = inFile(),
  * RCS history mechanism.
  */
 static
-Disregard(
-_ARX(char *,	lo)
-_AR1(char *,	hi)
-	)
-_DCL(char *,	lo)
-_DCL(char *,	hi)
+void	Disregard(
+	_ARX(char *,	lo)
+	_AR1(char *,	hi)
+		)
+	_DCL(char *,	lo)
+	_DCL(char *,	hi)
 {
 	while (lo <= hi) {
 		if (isalnum(*lo)) {
@@ -593,11 +596,11 @@ _DCL(char *,	hi)
  * unlike the RCS history.
  */
 static
-filter_history(
-_AR1(int,	first))
-_DCL(int,	first)
+int	filter_history(
+	_AR1(int,	first))
+	_DCL(int,	first)
 {
-	typedef	enum	HSTATE	{unknown, cms, rlog, revision, contents};
+	enum	HSTATE	{unknown, cms, rlog, revision, contents};
 	static	char	*CMS_	= "DEC/CMS REPLACEMENT HISTORY,";
 	static	enum	HSTATE	hstate	= unknown;
 	static	char	buffer[BUFSIZ];
@@ -634,7 +637,7 @@ _DCL(int,	first)
 		/* try to find RCS identifier "Log" */
 		} else if (hstate == unknown) {
 			s = buffer;
-			while (d = strchr(s, '$')) {
+			while ((d = strchr(s, '$')) != NULL) {
 				s = d + 1;
 				if (!strncmp(d, "$Log", 4)
 				&&  (t = strchr(s, '$'))) {
@@ -646,7 +649,7 @@ _DCL(int,	first)
 		/* try to find "Revision" after comment-prefix */
 		} else if (hstate == rlog) {
 			s = buffer;
-			while (d = strchr(s, 'R')) {
+			while ((d = strchr(s, 'R')) != NULL) {
 				s = d + 1;
 				if (!strncmp(d, "Revision", 8)) {
 					strcpy(prefix, buffer)[d-buffer] = EOS;
@@ -678,10 +681,9 @@ _DCL(int,	first)
  * and nested comments with 'uncmt'.
  */
 static
-int
-Comment (
-_AR1(int,	c_plus_plus))
-_DCL(int,	c_plus_plus)
+int	Comment (
+	_AR1(int,	c_plus_plus))
+	_DCL(int,	c_plus_plus)
 {
 	register int	c;
 	auto	int	d = 0;
@@ -726,8 +728,7 @@ _DCL(int,	c_plus_plus)
  * pointer.
  */
 static
-int
-inFile (_AR0)
+int	inFile (_AR0)
 {
 	static	int	last_c;
 	static	int	is_blank;	/* true til we get nonblank on line */
@@ -817,8 +818,8 @@ register int c = fgetc(File);
 	return (c);
 }
 
-
-usage(_AR0)
+static
+void	usage(_AR0)
 {
 	static	char	*tbl[] = {
  "Usage: lincnt [options] [files]"
@@ -885,7 +886,7 @@ _MAIN
 	if (spreadsheet) {
 		if (per_file) {
 			if (opt_line)
-				PRINTF("%s%s%s%s%s%s%s%s%s%s%s%s",
+				PRINTF("%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 					"L-COMMENT",	comma,
 					"L-HISTORY",	comma,
 					"L-INLINE",	comma,
@@ -894,7 +895,7 @@ _MAIN
 					"L-CODE",	comma,
 					"L-TOTAL",	comma);
 			if (opt_char)
-				PRINTF("%s%s%s%s%s%s%s%s%s%s%s%s",
+				PRINTF("%s%s%s%s%s%s%s%s%s%s%s%s%s%s",
 					"C-COMMENT",	comma,
 					"C-HISTORY",	comma,
 					"C-IGNORE",	comma,
