@@ -1,4 +1,4 @@
-# $Id: Makefile,v 3.0 1990/05/11 10:00:58 ste_cm Rel $
+# $Id: Makefile,v 5.0 1990/08/30 08:05:08 ste_cm Rel $
 # make-file for testing LINCNT
 #
 
@@ -8,17 +8,20 @@ DATE	= @ echo '**** '`date` >>$@
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
-	run_tests.sh	run_tests.com
+	run_tests.sh	run_tests.com\
+	show_diffs.sh
 
 REF_FILES = \
 	cat.ref \
+	history.ref \
 	list.ref \
 	normal.ref \
 	quotes.ref
 
 TST_FILES = \
 	test1.c \
-	test2.c
+	test2.c \
+	test3.c
 
 SOURCES	= Makefile descrip.mms README $(SCRIPTS) $(REF_FILES) $(TST_FILES)
 
