@@ -64,7 +64,7 @@
 #include "system.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.14 1997/04/25 16:11:41 tom Exp $";
+static const char Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 7.15 1997/04/26 15:21:35 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -346,10 +346,12 @@ void	show_totals(
 static
 void	summarize(
 	_ARG(STATS *,	p),
-	_ARG(int,	mark)
+	_ARG(int,	mark),
+	_ARG(int,	name)
 		)
 	_DCL(STATS *,	p)
 	_DCL(int,	mark)
+	_DCL(int,	name)
 {
 	newsum = FALSE;
 	if (spreadsheet) {
@@ -358,7 +360,7 @@ void	summarize(
 			p->stmts_total,	comma);
 	} else {
 		PRINTF ("%6ld ",
-			p->lines_total + 1);
+			p->lines_total + (mark && !name));
 		if ((p->stmts_total != old_stmts) || !mark) {
 			PRINTF ("%5ld", p->stmts_total);
 		} else {
@@ -382,7 +384,7 @@ void	Summary(
 	_DCL(int,	mark)
 {
 	if (newsum)
-		summarize(&One,mark);
+		summarize(&One,mark,FALSE);
 }
 
 #define	ADD(m)	All.m += One.m; One.m = 0
@@ -544,7 +546,7 @@ void	doFile (
 	if (per_file && spreadsheet) {
 		show_totals(&One);
 	} else if (!per_file)
-		summarize(&One,TRUE);
+		summarize(&One,TRUE,TRUE);
 	PRINTF("%s\n", name);
 	if (per_file && !spreadsheet) {
 		show_totals(&One);
@@ -1044,7 +1046,7 @@ int	main (
 	if (!spreadsheet && files_total) {
 		if (!per_file) {
 			PRINTF ("%s\n", dashes);
-			summarize(&All,FALSE);
+			summarize(&All,FALSE,FALSE);
 			PRINTF("%s\n",
 				jargon ?
 				"physical source statements/logical source statements" :
