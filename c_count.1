@@ -1,17 +1,16 @@
-.\" $Id: c_count.1,v 5.5 1991/11/01 10:46:38 dickey Exp $
-.de DS
+.\" $Id: c_count.1,v 5.7 1991/11/04 10:19:28 dickey Exp $
+.de EX
 .RS
 .nf
 .sp
+.fam C	\" groff: Courier
 ..
-.de DE
+.de EE
 .fi
 .RE
 .sp .5
+.fam T	\" groff: Times-Roman (default)
 ..
-.\" fool style
-.if n .ds z .
-.if t .ds z
 .
 .TH LINCNT 1
 .hy 0
@@ -77,11 +76,11 @@ file contains unterminated or nested comments.
 Unbalanced quotes may be legal.
 The C preprocessor permits you to
 define symbols which contain an unbalanced quote mark, for example:
-.DS
+.EX
 #define	WARN	(void)printf("** warning:
 	...
 	WARN item \"%s\" not found\n", token);
-.DE
+.EE
 .PP
 Rather than duplicate all of the complexity of the C preprocessor,
 \fBlincnt\fR permits you to specify symbols which contain
@@ -118,15 +117,15 @@ display statistics on a per-file basis.
 define tokens which may
 evaluate with an unbalanced quote mark '\fB"\fR'.
 For example,
-"-\fBq\ \fRWARN".
+"\fB\-q\ \fRWARN".
 .TP
 .B \-s
 display specialized statistics (e.g., code:comment ratio).
 .TP
 .B \-t
 generate output in spreadsheet format (e.g., comma-separated columns).
-If you set any of the options "-\fBc\fR", "-\fBi\fR",
-"-\fBl\fR" or "-\fBs\fR", \fBlincnt\fR generates these statistics.
+If you set any of the options "\fB\-c\fR", "\fB\-i\fR",
+"\fB\-l\fR" or "\fB\-s\fR", \fBlincnt\fR generates these statistics.
 Otherwise it generates only the lines/statements.
 .TP
 .B \-v
@@ -147,7 +146,7 @@ itself from the standard input.
 .PP
 Following is an example of the use of \fBlincnt\fR, showing
 the detailed types of information which it reports.
-.DS
+.EX
 bsd(5) lincnt */*.[ch]
    927   352   |src/lincnt.c
      5     0?" |test/test1.c
@@ -177,10 +176,10 @@ bsd(5) lincnt */*.[ch]
   0.29	ratio of comment:code
      3	?:illegal characters found
      2	":lines with unterminated quotes
-.DE
+.EE
 .PP
-If you use the "-\fBp\fR" option,
-\fBlincnt\fR would print the detailed information
+If you use the "\fB\-p\fR" option,
+\fBlincnt\fR prints the detailed information
 for each file, as well as for all files together.
 .
 .SH ENVIRONMENT
