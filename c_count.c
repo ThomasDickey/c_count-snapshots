@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.12 88/08/09 09:46:21";
+static	char	Id[] = "@(#)lincnt.c	1.14 88/08/15 13:06:39";
 #endif	lint
 
 /*
@@ -7,6 +7,7 @@ static	char	Id[] = "@(#)lincnt.c	1.12 88/08/09 09:46:21";
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		15 Aug 1988, use 'vecalloc()' rather than 'malloc()'
  *		01 Jun 1988, added token-length statistic
  *		01 Jul 1987, test for junky files (i.e., non-ascii characters,
  *			     nested comments, non-graphic characters in quotes),
@@ -32,7 +33,8 @@ static	char	Id[] = "@(#)lincnt.c	1.12 88/08/09 09:46:21";
 #include	<stdio.h>
 #include	<ctype.h>
 extern	int	optind;
-extern	char	*optarg, *malloc();
+extern	char	*optarg,
+		**vecalloc();
 
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	DEBUG	if (debug) PRINTF
@@ -74,7 +76,7 @@ char	*argv[];
 register int j;
 char	name[256];
 
-	quotvec = (char **)malloc((unsigned)(argc * sizeof(char *)));
+	quotvec = vecalloc((unsigned)(argc * sizeof(char *)));
 	while ((j = getopt(argc,argv,"dvq:")) != EOF) switch(j) {
 	case 'd':	debug	= TRUE;
 			break;
@@ -121,6 +123,13 @@ char	name[256];
 	}
 	(void)exit(0);
 	/*NOTREACHED*/
+}
+
+failed(s)
+char	*s;
+{
+	perror(s);
+	(void)exit(1);
 }
 
 usage()
@@ -358,7 +367,11 @@ register int c = fgetc(File);
 		}
 		if (verbose) {
 			if (num_chars == tot_chars)	Summary();
-			(void)putchar(c);
+#ifdef	putc
+			c = putchar((unsigned char)c);
+#else
+			c = putchar(c);
+#endif
 			newsum = TRUE;
 		}
 		tot_chars++;
