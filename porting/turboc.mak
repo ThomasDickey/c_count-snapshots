@@ -1,4 +1,4 @@
-# $Id: turboc.mak,v 1.1 1995/05/14 22:56:44 tom Exp $
+# $Id: turboc.mak,v 1.2 1995/05/21 00:09:18 tom Exp $
 #
 # Turbo C/C++ makefile for C line-counter
 # (adapted from PRJ2MAK output)
@@ -9,16 +9,16 @@ DEFINES = MSDOS
 
 #		*Translator Definitions*
 CC = tcc +c_count.cfg
-MODEL = l
+MODEL = s
 TLIB = tlib
 TLINK = tlink
 LIBPATH = C:\TC\LIB
-LIBS = $(LIBPATH)\wildargs.obj
 INCLUDEPATH = .;\tc\include
 
 OBJECTS = \
 	c_count.obj \
-	getopt.obj
+	getopt.obj \
+	wildcard.obj
 
 all: c_count.exe
 
@@ -44,7 +44,7 @@ c_count.exe: c_count.cfg $(OBJECTS)
 c0$(MODEL).obj+
 c_count.obj +
 getopt.obj +
-$(LIBS)
+wildcard.obj
 c_count
 		# no map file
 emu.lib+
@@ -89,3 +89,4 @@ c_count.cfg: turboc.mak
 | c_count.cfg
 
 c_count.obj : c_count.cfg system.h
+wildcard.obj : c_count.cfg system.h

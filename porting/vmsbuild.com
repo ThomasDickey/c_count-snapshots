@@ -1,4 +1,4 @@
-$! $Header: /users/source/archives/c_count.vcs/porting/RCS/vmsbuild.com,v 1.1 1995/05/14 23:19:58 tom Exp $
+$! $Header: /users/source/archives/c_count.vcs/porting/RCS/vmsbuild.com,v 1.2 1995/05/21 23:05:44 tom Exp $
 $! VMS build-script for C_COUNT.  Requires "VAX-C" or "DEC-C".
 $!
 $
@@ -46,6 +46,12 @@ $
 $ install :
 $	WRITE SYS$ERROR "** no rule for install"
 $	goto build_last
+$	
+$ check :
+$	set default [.testing]
+$	@run_test.dcl
+$	set default [-]	
+$	exit
 $	
 $ distclean :
 $	if f$search("*.exe") .nes. "" then delete *.exe;*
