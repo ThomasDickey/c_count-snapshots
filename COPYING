@@ -1,16 +1,12 @@
-$Id: COPYING,v 7.0 1993/05/05 09:59:54 ste_cm Rel $
+$Id: COPYING,v 7.2 1994/07/18 01:16:59 tom Exp $
 
-LINCNT
+C_COUNT
 
 --------------------------------------------------------------------------------
 
-Copyright (c) 1993 Software Productivity Consortium, Inc.
-All Rights Reserved.
+Copyright 1994 by Thomas E. Dickey.  All Rights Reserved.
 
-This is proprietary property of the Software Productivity Consortium, Inc. The 
-contents of this software shall be kept confidential pursuant to the terms of 
-the Technology Management and License Agreement, as amended from time to time, 
-with the Software Productivity Consortium Limited Partnership. This software 
-shall only be disseminated in accordance with the terms and conditions of that 
-Agreement. All complete or partial copies of this software must contain a copy 
-of this statement.
+You may freely copy or redistribute this software, so long as there is no profit
+made from its use, sale trade or reproduction. You may not change this copyright
+notice, and it must be included in any copy made.
+

@@ -1,5 +1,5 @@
-# $Id: Makefile,v 7.0 1993/04/28 09:40:00 ste_cm Rel $
-# make-file for testing LINCNT
+# $Id: Makefile,v 7.1 1994/07/18 01:27:49 tom Exp $
+# make-file for testing C_COUNT
 
 TOP	= ../..
 include $(TOP)/td_lib/support/td_lib.mk
@@ -32,7 +32,6 @@ clobber:	clean		; rm -f $(ALL)
 destroy:			; $(DESTROY)
 sources:	$(SOURCES)
 lint.out:
-lincnt.out:
 run_test:	$(SOURCES)	; $(RUN_TESTS)
 
 ####### (Details of Productions) ###############################################

@@ -1,5 +1,5 @@
-# $Id: descrip.mms,v 7.0 1993/05/05 14:44:13 ste_cm Rel $
-# mms-file for testing LINCNT
+# $Id: descrip.mms,v 7.1 1994/07/18 01:28:10 tom Exp $
+# mms-file for testing C_COUNT
 #
 
 .INCLUDE PORTUNIX_ROOT:[SUPPORT]LIBRARY_RULES

@@ -14,8 +14,8 @@
      0	nontext-comment-chars      0.0 %
     19	whitespace-chars          10.2 %
     19	preprocessor-chars        10.2 %
-   148	statement-chars           79.6 %
-   186	total characters         100.0 %
+   149	statement-chars           79.7 %
+   187	total characters         100.0 %
 
     46	tokens, average length 0.91
 

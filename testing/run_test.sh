@@ -1,8 +1,8 @@
 #!/bin/sh
-# $Id: run_test.sh,v 7.0 1993/04/28 09:40:23 ste_cm Rel $
+# $Id: run_test.sh,v 7.1 1994/07/18 01:29:03 tom Exp $
 #
-PROG=../bin/lincnt
-TMP=/tmp/lincnt$$
+PROG=../bin/c_count
+TMP=/tmp/c_count$$
 rm -f $TMP
 #
 cat <<EOF/
