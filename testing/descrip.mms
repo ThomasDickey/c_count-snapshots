@@ -1,4 +1,4 @@
-# $Id: descrip.mms,v 6.0 1991/10/21 16:35:44 ste_cm Rel $
+# $Id: descrip.mms,v 7.0 1993/05/05 14:44:13 ste_cm Rel $
 # mms-file for testing LINCNT
 #
 
@@ -8,8 +8,8 @@
 
 ####### (Standard Lists) #######################################################
 SCRIPTS	=\
-	run_tests.sh	run_tests.com\
-	show_diffs.sh
+	run_test.sh	run_test.com\
+	showdiff.sh
 
 REF_FILES = \
 	cat.ref \
@@ -42,7 +42,7 @@ CLOBBER :	CLEAN
 DESTROY :
 	-remove -fv *.*;*
 
-RUN_TESTS :	$(SCRIPTS)
-	@run_tests
+RUN_TEST :	$(SCRIPTS)
+	@run_test
 
 ####### (Details of Productions) ###############################################
