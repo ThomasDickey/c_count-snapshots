@@ -1,5 +1,5 @@
 #ifndef NO_IDENT
-static char *Id = "$Id: wildcard.c,v 1.2 1995/05/15 00:30:06 tom Exp $";
+static char *Id = "$Id: wildcard.c,v 1.3 1995/05/21 00:02:00 tom Exp $";
 #endif
 
 /*
@@ -8,27 +8,68 @@ static char *Id = "$Id: wildcard.c,v 1.2 1995/05/15 00:30:06 tom Exp $";
 
 #include "system.h"
 
-#if SYS_VMS
+#if HAVE_STDLIB_H
+# include <stdlib.h>
+#endif
 
-#include <stdlib.h>
+#if HAVE_STRING_H
+# include <string.h>
+#endif
+
+#if SYS_MSDOS || SYS_OS2
+# if SYS_MSDOS
+#  include <dos.h>
+#  include <dir.h>		/* defines MAXPATH */
+#  define FILENAME_MAX MAXPATH
+# endif
+# define DeclareFind(p)		struct find_t p
+# define DirEntryStr(p)		p.name
+# define DirFindFirst(path,p)	(!_dos_findfirst(path, 0, &p))
+# define DirFindNext(p)		(!_dos_findnext(&p))
+#endif
+
+#if SYS_VMS
 
 #include <starlet.h>		/* DEC-C (e.g., sys$parse) */
 #include <stdio.h>		/* perror */
 
 #include <rms.h>
 #include <descrip.h>
-/*#include <unixio.h>*/
-#include <string.h>
+
+#endif	/* SYS_VMS */
 
 int	has_wildcard (char *path)
 {
+#if SYS_VMS
 	return (strstr(path, "...") != 0
 	   ||   strchr(path, '*') != 0
 	   ||   strchr(path, '?') != 0);
+#else	/* SYS_MSDOS, SYS_OS2 */
+	return (strchr(path, '*') != 0
+	   ||   strchr(path, '?') != 0);
+#endif
 }
 
 int	expand_wildcard (char *path, int initiate)
 {
+#if SYS_MSDOS || SYS_OS2
+	static	DeclareFind(p);
+	static	char	temp[FILENAME_MAX + 1];
+	register char	*leaf;
+
+	if ((leaf = strchr(path, '/')) == 0
+	 && (leaf = strchr(path, '\\')) == 0)
+		leaf = path;
+	else
+		leaf++;
+
+	if ((initiate && DirFindFirst(strcpy(temp,path),p))
+	 || DirFindNext(p)) {
+		(void)strcpy(leaf, DirEntryStr(p));
+		return TRUE;
+	}
+#endif /* SYS_MSDOS || SYS_OS2 */
+#if SYS_VMS
 	static	struct	FAB	zfab;
 	static	struct	NAM	znam;
 	static	char	my_esa[NAM$C_MAXRSS];	/* expanded: SYS$PARSE */
@@ -59,7 +100,8 @@ int	expand_wildcard (char *path, int initiate)
 		strncpy(path, my_rsa, znam.nam$b_rsl)[znam.nam$b_rsl] = '\0';
 		return (TRUE);
 	}
+#endif	/* SYS_VMS */
+#if SYS_MSDOS
+#endif
 	return FALSE;
 }
-
-#endif	/* VMS */

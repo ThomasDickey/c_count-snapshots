@@ -1,4 +1,4 @@
-# $Id: descrip.mms,v 7.2 1995/05/15 00:02:19 tom Exp $
+# $Id: descrip.mms,v 7.3 1995/05/21 23:05:07 tom Exp $
 #
 # VMS makefile for C_COUNT.  Requires "MMS"
 
@@ -50,6 +50,11 @@ clean :
 
 distclean : clean
 	@- if f$search("*.exe") .nes. "" then delete *.exe;*
+
+check :
+	set default [.testing]
+	@run_test.dcl
+	set default [-]	
 
 $(OBJ) : system.h
 

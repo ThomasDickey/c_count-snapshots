@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t19950520
+MANIFEST for c_count, version v7_0
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 CHANGES                         extracted change-log from c_count.c
@@ -32,8 +32,10 @@ testing/history.ref             reference (output from history-filtering)
 testing/list.ref                reference (output from list-test)
 testing/normal.ref              reference (output from normal test)
 testing/quotes.ref              reference (output from unbalanced-quote test)
+testing/run_test.bat            test-script for MSDOS
 testing/run_test.dcl            VMS test-script for C_COUNT
 testing/run_test.sh             UNIX test-script for C_COUNT
+testing/showdiff.bat            compute test-differences for MSDOS
 testing/showdiff.sh             perform reference-comparison for 'run_tests.sh'
 testing/table.ref               reference (spreadsheet/tabular output)
 testing/table_p.ref             reference (output from per-file table)
