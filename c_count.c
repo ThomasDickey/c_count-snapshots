@@ -1,9 +1,6 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.2 86/04/23 10:55:02";
+static	char	Id[] = "@(#)lincnt.c	1.3 86/10/07 13:35:08";
 #endif	lint
-
-#include	<stdio.h>
-#include	<ctype.h>
 
 /*
  * Title:	lincnt.c
@@ -19,16 +16,21 @@ static	char	Id[] = "@(#)lincnt.c	1.2 86/04/23 10:55:02";
  *		arguments are given, then the file is read from standard input.
  */
 
+#include	<stdio.h>
+#include	<ctype.h>
+extern	void	exit();
+
 #define	OCTAL	3		/* # of octal digits permissible in escape */
 #define	TRUE	1
 #define	FALSE	0
-#define	PERCENT(n,s) printf ("%.1f%% s", (100.0*n)/tot_chars);
+#define	PRINTF	(void) printf
+#define	PERCENT(n,s) PRINTF ("%.1f%% s", (100.0*n)/tot_chars);
 
 static	FILE	*File;
 
 static	int	literal;
 				/* Running totals: */
-static	int	tot_chars = 0,	/* # of characters */
+static	long	tot_chars = 0,	/* # of characters */
 		tot_lines = 0,	/* # of lines	   */
 		tot_stmts = 0,	/* # of statements */
 		tot_white = 0,	/* Whitespace size */
@@ -49,23 +51,23 @@ char	name[256];
 		doFile (name);
 
 	if (tot_chars) {
-		printf ("--------\n");
-		printf ("%8d characters", tot_chars);
+		PRINTF ("--------\n");
+		PRINTF ("%8d characters", tot_chars);
 		if (tot_white || tot_notes) {
-			printf (" (");
+			PRINTF (" (");
 			if (tot_white)	PERCENT(tot_white,whitespace);
-			if (tot_white && tot_notes) printf(", ");
+			if (tot_white && tot_notes) PRINTF(", ");
 			if (tot_notes)	PERCENT(tot_notes,comment);
-			putchar(')');
+			PRINTF(")");
 			if (tot_stmts && tot_notes)
-				printf (": %.2f", (tot_notes*1.)
+				PRINTF (": %.2f", (tot_notes*1.)
 					/(tot_chars-tot_white-tot_notes));
 		}
-		putchar('\n');
-		printf ("%8d lines\n", tot_lines);
-		printf ("%8d statements\n", tot_stmts);
+		PRINTF("\n");
+		PRINTF ("%8d lines\n", tot_lines);
+		PRINTF ("%8d statements\n", tot_stmts);
 	}
-	exit(0);
+	return(0);
 }
 
 /*
@@ -74,7 +76,8 @@ char	name[256];
 doFile (name)
 char	*name;
 {
-register int c,
+register int c;
+register long
 	num_lines = tot_lines,
 	num_stmts = tot_stmts;
 
@@ -97,8 +100,8 @@ register int c,
 			c = inFile();
 		}
 	}
-	printf ("%8d %8d %s\n", tot_lines-num_lines, tot_stmts-num_stmts, name);
-	fclose (File);
+	PRINTF ("%8d %8d %s\n", tot_lines-num_lines, tot_stmts-num_stmts, name);
+	(void) fclose (File);
 }
 
 /*
