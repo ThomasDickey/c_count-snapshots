@@ -1,5 +1,5 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.8 87/07/28 08:26:57";
+static	char	Id[] = "@(#)lincnt.c	1.9 87/08/28 17:11:43";
 #endif	lint
 
 /*
@@ -120,7 +120,8 @@ char	name[256];
 		if (tot_uncmt)
 			PRINTF("%8ld *:unterminated/nested comments\n", tot_uncmt);
 	}
-	return(0);
+	(void)exit(0);
+	/*NOTREACHED*/
 }
 
 usage()
@@ -345,7 +346,7 @@ register int c = fgetc(File);
 		}
 		if (verbose) {
 			if (num_chars == tot_chars)	Summary();
-			putchar(c);
+			(void)putchar(c);
 			newsum = TRUE;
 		}
 		tot_chars++;
