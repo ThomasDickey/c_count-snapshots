@@ -1,15 +1,21 @@
 #ifndef	lint
-static	char	Id[] = "$Id: c_count.c,v 4.0 1990/08/30 13:00:00 ste_cm Rel $";
-#endif	lint
+static	char	Id[] = "$Header: /users/source/archives/c_count.vcs/RCS/c_count.c,v 5.0 1991/05/23 08:05:42 ste_cm Rel $";
+#endif
 
 /*
  * Title:	lincnt.c
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * $Log: c_count.c,v $
- * Revision 4.0  1990/08/30 13:00:00  ste_cm
- * BASELINE Thu Aug 30 13:30:28 1990 -- filter RCS and CMS history
+ * Revision 5.0  1991/05/23 08:05:42  ste_cm
+ * BASELINE Wed Jun 12 17:42:45 1991 -- apollo sr10.3
  *
+ *		Revision 4.1  91/05/23  08:05:42  dickey
+ *		apollo sr10.3 cpp complains about endif-tags
+ *		
+ *		Revision 4.0  90/08/30  13:00:00  ste_cm
+ *		BASELINE Thu Aug 30 13:30:28 1990 -- filter RCS and CMS history
+ *		
  *		Revision 3.4  90/08/30  13:00:00  dickey
  *		history could be RCS or CMS (corrected message)
  *		
