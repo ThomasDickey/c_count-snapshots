@@ -1,12 +1,16 @@
 #ifndef	lint
-static	char	Id[] = "@(#)lincnt.c	1.4 86/10/08 12:09:09";
+static	char	Id[] = "@(#)lincnt.c	1.5 86/11/07 07:54:46";
 #endif	lint
 
 /*
  * Title:	lincnt.c
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
- * Modified:	23 Apr 1986, treat standard-input as a list of names, not code.
+ * Modified:
+ *		07 Nov 1986, added tested for unbalanced quote, comment so we
+ *			     can get reasonable counts for ddn-driver, etc.
+ *			     Also fixed printf-formats for xenix-port.
+ *		23 Apr 1986, treat standard-input as a list of names, not code.
  *		28 Jan 1985, make final 'exit()' with return code.
  *
  * Function:	Count lines and statements in one or more C program files,
@@ -40,8 +44,12 @@ static	int	literal;
 static	long	tot_chars = 0,	/* # of characters */
 		tot_lines = 0,	/* # of lines	   */
 		tot_stmts = 0,	/* # of statements */
+		tot_unquo = 0,	/* # of unbalanced quotes (line) */
+		tot_uncmt = 0,	/* # of unbalanced comments (file) */
 		tot_white = 0,	/* Whitespace size */
 		tot_notes = 0;	/* Comment-length  */
+
+static	long	unquo, uncmt;	/* per-file, for running totals */
 
 main (argc, argv)
 int	argc;
@@ -59,21 +67,25 @@ char	name[256];
 
 	if (tot_chars) {
 		PRINTF ("--------\n");
-		PRINTF ("%8d characters", tot_chars);
+		PRINTF ("%8ld characters", tot_chars);
 		if ((tot_white != 0L) || (tot_notes != 0L)) {
+		long	bot_ratio = (tot_chars - tot_white - tot_notes);
 			PRINTF (" (");
 			if (tot_white)	PERCENT(tot_white,whitespace);
 			if (tot_white && tot_notes) PRINTF(", ");
 			if (tot_notes)	PERCENT(tot_notes,comment);
 			PRINTF(")");
-			if (tot_stmts && tot_notes) {
-			long	bot_ratio = (tot_chars - tot_white - tot_notes);
-				PRINTF (": %.2f", (tot_notes*1.) / bot_ratio);
+			if (tot_stmts && bot_ratio) {
+				PRINTF (": %.2f", ((float)tot_notes)/bot_ratio);
 			}
 		}
 		PRINTF("\n");
-		PRINTF ("%8d lines\n", tot_lines);
-		PRINTF ("%8d statements\n", tot_stmts);
+		PRINTF ("%8ld lines\n", tot_lines);
+		PRINTF ("%8ld statements\n", tot_stmts);
+		if (tot_unquo)
+			PRINTF("%8ld lines with unterminated quotes\n", tot_unquo);
+		if (tot_uncmt)
+			PRINTF("%8ld files with unterminated comments\n", tot_uncmt);
 	}
 	return(0);
 }
@@ -91,6 +103,7 @@ register long
 
 	if (!(File = fopen (name, "r")))	 return;
 
+	uncmt = unquo = 0;
 	c = inFile ();
 	while (c != EOF) {
 		switch (c) {
@@ -108,7 +121,11 @@ register long
 			c = inFile();
 		}
 	}
-	PRINTF ("%8d %8d %s\n", tot_lines-num_lines, tot_stmts-num_stmts, name);
+	PRINTF ("%8ld %8ld%c %s\n",
+		tot_lines-num_lines, tot_stmts-num_stmts,
+		((unquo || uncmt) ? '?' : ' '), name);
+	tot_unquo += unquo;
+	tot_uncmt += uncmt;
 	(void) fclose (File);
 }
 
@@ -122,7 +139,10 @@ register int c = inFile();
 
 	literal = TRUE;
 	while (c != EOF) {
-		if (c == mark) {
+		if (c == '\n') {	/* this is legal, but not likely */
+			unquo++;	/* ...assume balance is in macro */
+			return (inFile());
+		} else if (c == mark) {
 			literal = FALSE;
 			return (inFile());
 		}
@@ -171,6 +191,7 @@ register int c = inFile();
 		else
 			c = inFile();
 	}
+	uncmt++;
 	return (c);			/* Unterminated comment! */
 }
 
