@@ -3,6 +3,11 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		16 Jul 2005, modify treatment of -v option so it buffers data
+ *			     to allow reporting the current line, rather than
+ *			     the previous line.  Originally a debugging option,
+ *			     it is useful in itself for making formatted
+ *			     listings.
  *		26 Jun 2005, add -n option.  Correct treatment of "#" in
  *			     quotes (could be confused with preprocessor).
  *			     Correct treatment of blanks in quoted string in
@@ -84,7 +89,7 @@
 #include "patchlev.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Id: c_count.c,v 7.46 2005/06/26 21:01:35 tom Exp $";
+static const char Id[] = "$Id: c_count.c,v 7.47 2005/07/16 12:10:12 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -229,6 +234,11 @@ static int limit_name = 32;
 static int read_last;
 static int wrote_last;
 static int newsum;		/* TRUE iff we need a summary */
+
+/* buffer line for verbose-mode */
+static char *big_line = 0;
+static unsigned big_used = 0;
+static unsigned big_size = 0;
 
 static char *comma = ",";
 static char *dashes = "----------------";
@@ -637,8 +647,6 @@ countChar(int ch)
 	read_last = EOS;
 	is_blank = TRUE;
     } else {
-	if (verbose && (!One.chars_total || read_last == '\n'))
-	    Summary(TRUE);
 	newsum = TRUE;
 	if (!isascii(ch) || (!isprint(ch) && !isspace(ch))) {
 	    ch = '?';		/* protect/flag this */
@@ -649,10 +657,23 @@ countChar(int ch)
 	 * carriage return unless it is embedded in the line.
 	 */
 	if (verbose) {
-	    if (ch != '\r') {
-		if (ch != '\n' && wrote_last == '\r')
-		    (void) putchar('\r');
-		(void) putchar(ch);
+	    if (big_used + 4 >= big_size) {
+		big_line = realloc(big_line, big_size *= 2);
+		if (big_line == 0) {
+		    perror("realloc");
+		    exit(EXIT_FAILURE);
+		}
+	    }
+	    if (wrote_last == '\r' && ch != '\n') {
+		big_line[big_used - 1] = '^';
+		big_line[big_used++] = 'M';
+	    }
+	    big_line[big_used++] = ch;
+	    big_line[big_used] = EOS;
+	    if (ch == '\n') {
+		Summary(TRUE);
+		fputs(big_line, stdout);
+		big_line[big_used = 0] = EOS;
 	    }
 	}
 	wrote_last = ch;
@@ -1280,6 +1301,7 @@ main(int argc, char **argv)
 	    return EXIT_SUCCESS;
 	case 'v':
 	    verbose++;
+	    big_line = malloc(big_size = 1024);
 	    break;
 	case 'w':
 	    limit_name = atoi(optarg);
