@@ -1,4 +1,4 @@
-MANIFEST for c_count, version t20091231
+MANIFEST for c_count, version t20100707
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 CHANGES                         extracted change-log from c_count.c
@@ -18,6 +18,11 @@ makefile.in                     makefile-template for C_COUNT
 mkdirs.sh                       mkinstalldirs script (renamed for porting)
 patchlev.h                      patch-level of C_COUNT
 system.h                        template for autoconf includes
+package/debian                  subdirectory
+package/debian/compat           debian build script
+package/debian/docs             debian build script
+package/debian/source           subdirectory
+package/debian/source/format    debian build script
 porting                         subdirectory
 porting/README                  description of files in porting directory
 porting/getopt.c                public-domain version of 'getopt()'
