@@ -1,6 +1,19 @@
--- $Id: CHANGES,v 7.18 2010/07/16 23:41:59 tom Exp $
+-- $Id: CHANGES,v 7.21 2010/07/17 13:57:26 tom Exp $
 
-2010/7/16
+2010/7/17 (c_count 7.12)
+
+	+ escape dashes in manpage as needed to work around groff.
+
+	+ fix strict gcc warnings
+
+	+ support DESTDIR in makefile.
+
+	+ add configure checks for lint and ctags.
+
+	+ add configure --disable-leaks and --with-valgrind options.
+
+	+ change configure --with-warnings to --enable-warnings, for
+	  consistency.
 
 	+ rename install.sh to install-sh, to avoid problems with some make's
 	  suffix rules.
