@@ -1,4 +1,4 @@
-# $Id: makefile.in,v 7.10 2005/06/26 21:21:20 tom Exp $
+# $Id: makefile.in,v 7.11 2010/07/16 23:33:54 tom Exp $
 # Makefile-template for 'c_count'
 
 SHELL		= /bin/sh
@@ -62,7 +62,7 @@ install: all installdirs
 	$(INSTALL_DATA) $(srcdir)/$(THIS).1 $(mandir)/$(actual_man)
 
 installdirs:
-	$(SHELL) ${srcdir}/mkdirs.sh $(bindir) $(libdir) $(mandir)
+	mkdir -p $(bindir) $(libdir) $(mandir)
 
 uninstall:
 	rm -f $(bindir)/$(actual_bin)
