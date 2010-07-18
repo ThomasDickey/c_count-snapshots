@@ -94,7 +94,7 @@
 #include "patchlev.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Id: c_count.c,v 7.54 2010/07/17 00:26:52 tom Exp $";
+static const char Id[] = "$Id: c_count.c,v 7.55 2010/07/18 00:12:14 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -128,8 +128,9 @@ extern char *optarg;
 #define strchr index
 #endif
 
+#define UCH(c)     ((unsigned char)(c))
 #ifndef isascii
-#define isascii(c) ((unsigned char)(c) < 128)
+#define isascii(c) (UCH(c) < 128)
 #endif
 
 #ifndef EXIT_SUCCESS		/* normally in <stdlib.h> */
@@ -256,8 +257,8 @@ static int newsum;		/* TRUE iff we need a summary */
 
 /* buffer line for verbose-mode */
 static char *big_line = 0;
-static unsigned big_used = 0;
-static unsigned big_size = 0;
+static size_t big_used = 0;
+static size_t big_size = 0;
 
 static const char *comma = ",";
 static const char *dashes = "----------------";
@@ -590,8 +591,8 @@ static int
 Token(int c)
 {
     static char *bfr;
-    static unsigned used = 0;
-    static unsigned have = 0;
+    static size_t used = 0;
+    static size_t have = 0;
 
     enum PSTATE bstate = pstate;
     int j = 0;
@@ -1022,7 +1023,7 @@ static void
 Disregard(char *lo, char *hi)
 {
     while (lo <= hi) {
-	if (isalnum(*lo)) {
+	if (isalnum(UCH(*lo))) {
 	    One.chars_notes -= 1;
 	    One.chars_rlogs += 1;
 	}
@@ -1035,7 +1036,7 @@ Disregard(char *lo, char *hi)
 /*
  * Compare strings ignoring blanks (TD_LIB)
  */
-#define	SKIP(p)	while (isspace(*p))	p++;
+#define	SKIP(p)	while (isspace(UCH(*p)))	p++;
 
 static int
 strbcmp(char *a, char *b)
@@ -1043,7 +1044,7 @@ strbcmp(char *a, char *b)
     int cmp;
 
     while (*a && *b) {
-	if (isspace(*a) && isspace(*b)) {
+	if (isspace(UCH(*a)) && isspace(UCH(*b))) {
 	    SKIP(a);
 	    SKIP(b);
 	} else if ((cmp = (*a++ - *b++)) != EOS)
@@ -1116,7 +1117,7 @@ filter_history(int first)
 	    s = buffer;
 	    while ((d = strchr(s, '$')) != NULL) {
 		s = d + 1;
-		if (!strncmp(d, "$Log", 4)
+		if (!strncmp(d, "$Log", (size_t) 4)
 		    && (t = strchr(s, '$')) != 0) {
 		    hstate = rlog;
 		    Disregard(d, t);
@@ -1128,7 +1129,7 @@ filter_history(int first)
 	    s = buffer;
 	    while ((d = strchr(s, 'R')) != NULL) {
 		s = d + 1;
-		if (!strncmp(d, "Revision", 8)) {
+		if (!strncmp(d, "Revision", (size_t) 8)) {
 		    size_t len2 = (size_t) (d - buffer);
 		    strcpy(prefix, buffer)[len2] = EOS;
 		    hstate = revision;
@@ -1416,7 +1417,7 @@ main(int argc, char **argv)
 	for (j = optind; j < argc; j++)
 	    doFile(argv[j]);
     } else {
-	while (fgets(name, sizeof(name) - 1, stdin)) {
+	while (fgets(name, (int) sizeof(name) - 1, stdin)) {
 	    size_t len = strlen(name);
 	    if (len != 0 && name[--len] == '\n')
 		name[len] = EOS;
