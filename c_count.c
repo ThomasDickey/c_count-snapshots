@@ -76,7 +76,7 @@
  *			     can get reasonable counts for ddn-driver, etc.
  *			     Also fixed printf-formats for xenix-port.
  *		23 Apr 1986, treat standard-input as a list of names, not code.
- *		28 Jan 1985, make final 'exit()' with return code.
+ *		28 Jan 1986, make final 'exit()' with return code.
  *
  * Function:	Count lines and statements in one or more C program files,
  *		giving statistics on percentage commented.
@@ -95,7 +95,7 @@
 #include "patchlev.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Id: c_count.c,v 7.57 2013/08/24 20:00:22 tom Exp $";
+static const char Id[] = "$Id: c_count.c,v 7.58 2013/08/25 00:40:19 tom Exp $";
 #endif
 
 #include <stdio.h>
