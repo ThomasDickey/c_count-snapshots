@@ -1,4 +1,4 @@
-# $Id: makefile.in,v 7.14 2013/08/24 19:19:04 tom Exp $
+# $Id: makefile.in,v 7.15 2013/08/25 00:51:24 tom Exp $
 # Makefile-template for 'c_count'
 
 SHELL		= /bin/sh
@@ -45,9 +45,32 @@ o		= .@OBJEXT@
 
 #### End of system configuration section. ####
 
+################################################################################
+.SUFFIXES : $o .i .html .$(manext) .cat .ps .pdf .txt
+
 .c$o:
 	@RULE_CC@
 	@ECHO_CC@$(CC) -c $(CPPFLAGS) $(CFLAGS) $<
+
+.c.i :
+	@RULE_CC@
+	@ECHO_CC@$(CPP) -C $(CPPFLAGS) $*.c >$@
+
+.$(manext).cat :
+	- nroff -man $(srcdir)/$(THIS).$(manext) >$@
+
+.$(manext).html :
+	GROFF_NO_SGR=stupid $(SHELL) -c "tbl $*.$(manext) | groff -Thtml -man" >$@
+
+.$(manext).ps :
+	$(SHELL) -c "tbl $*.$(manext) | groff -man" >$@
+
+.$(manext).txt :
+	GROFF_NO_SGR=stupid $(SHELL) -c "tbl $*.$(manext) | nroff -Tascii -man | col -bx" >$@
+
+.ps.pdf :
+	ps2pdf $*.ps
+################################################################################
 
 OBJ = $(THIS)$o
 
@@ -123,3 +146,13 @@ dist: MANIFEST
 	rm -rf `cat .fname` .fname .files
 
 $(THIS)$o:	config.h
+################################################################################
+docs :: $(THIS).html \
+	$(THIS).pdf \
+	$(THIS).ps \
+	$(THIS).txt
+$(THIS).html : $(THIS).$(manext)
+$(THIS).pdf : $(THIS).ps
+$(THIS).ps : $(THIS).$(manext)
+$(THIS).txt : $(THIS).$(manext)
+################################################################################
