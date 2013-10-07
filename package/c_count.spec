@@ -1,7 +1,7 @@
 Summary: c_count - C-language line counter
 %define AppProgram c_count
-%define AppVersion 7.13
-# $Id: c_count.spec,v 1.3 2013/08/24 19:24:03 tom Exp $
+%define AppVersion 7.14
+# $Id: c_count.spec,v 1.4 2013/10/07 15:49:46 tom Exp $
 Name: %{AppProgram}
 Version: %{AppVersion}
 Release: 1

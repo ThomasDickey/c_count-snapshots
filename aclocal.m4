@@ -1,4 +1,4 @@
-dnl $Id: aclocal.m4,v 7.9 2013/08/24 19:18:25 tom Exp $
+dnl $Id: aclocal.m4,v 7.11 2013/10/07 15:57:14 tom Exp $
 dnl Process this file with autoconf to produce a configure script.
 dnl
 dnl See also
@@ -676,6 +676,60 @@ cf_save_CFLAGS="$cf_save_CFLAGS -we147 -no-gcc"
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
+dnl CF_MAKE_DOCS version: 2 updated: 2013/01/02 20:04:08
+dnl ------------
+dnl $1 = name(s) to generate rules for
+dnl $2 = suffix of corresponding manpages used as input.
+define([CF_MAKE_DOCS],[
+test -z "$cf_make_docs" && cf_make_docs=0
+
+cf_output=makefile
+test -f "$cf_output" || cf_output=Makefile
+
+if test "$cf_make_docs" = 0
+then
+cat >>$cf_output <<"CF_EOF"
+################################################################################
+.SUFFIXES : .html .$2 .man .ps .pdf .txt
+
+.$2.html :
+	GROFF_NO_SGR=stupid [$](SHELL) -c "tbl [$]*.$2 | groff -P -o0 -I$*_ -Thtml -man" >[$]@
+
+.$2.ps :
+	[$](SHELL) -c "tbl [$]*.$2 | groff -man" >[$]@
+
+.$2.txt :
+	GROFF_NO_SGR=stupid [$](SHELL) -c "tbl [$]*.$2 | nroff -Tascii -man | col -bx" >[$]@
+
+.ps.pdf :
+	ps2pdf [$]*.ps
+
+CF_EOF
+	cf_make_docs=1
+fi
+
+for cf_name in $1
+do
+cat >>$cf_output <<CF_EOF
+################################################################################
+docs-$cf_name \\
+docs :: $cf_name.html \\
+	$cf_name.pdf \\
+	$cf_name.ps \\
+	$cf_name.txt
+
+clean \\
+docs-clean ::
+	rm -f $cf_name.html $cf_name.pdf $cf_name.ps $cf_name.txt
+
+$cf_name.html : $cf_name.$2
+$cf_name.pdf : $cf_name.ps
+$cf_name.ps : $cf_name.$2
+$cf_name.txt : $cf_name.$2
+CF_EOF
+done
+])dnl
+dnl ---------------------------------------------------------------------------
 dnl CF_MAKE_TAGS version: 6 updated: 2010/10/23 15:52:32
 dnl ------------
 dnl Generate tags/TAGS targets for makefiles.  Do not generate TAGS if we have
@@ -713,7 +767,7 @@ AC_SUBST(MAKE_UPPER_TAGS)
 AC_SUBST(MAKE_LOWER_TAGS)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_MIXEDCASE_FILENAMES version: 4 updated: 2012/10/02 20:55:03
+dnl CF_MIXEDCASE_FILENAMES version: 5 updated: 2013/09/07 13:54:05
 dnl ----------------------
 dnl Check if the file-system supports mixed-case filenames.  If we're able to
 dnl create a lowercase name and see it as uppercase, it doesn't support that.
@@ -722,7 +776,7 @@ AC_DEFUN([CF_MIXEDCASE_FILENAMES],
 AC_CACHE_CHECK(if filesystem supports mixed-case filenames,cf_cv_mixedcase,[
 if test "$cross_compiling" = yes ; then
 	case $target_alias in #(vi
-	*-os2-emx*|*-msdosdjgpp*|*-cygwin*|*-mingw32*|*-uwin*) #(vi
+	*-os2-emx*|*-msdosdjgpp*|*-cygwin*|*-msys*|*-mingw32*|*-uwin*) #(vi
 		cf_cv_mixedcase=no
 		;;
 	*)
