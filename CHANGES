@@ -1,4 +1,12 @@
--- $Id: CHANGES,v 7.24 2013/08/25 00:37:24 tom Exp $
+-- $Id: CHANGES,v 7.25 2013/10/07 15:39:22 tom Exp $
+
+2010/10/07 (c_count 7.14)
+	+ improve cross-compiling, to supply getopt from porting directory
+	  for systems which lack this.
+
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2010/08/24 (c_count 7.13)
 
