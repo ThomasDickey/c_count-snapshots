@@ -1,6 +1,11 @@
--- $Id: CHANGES,v 7.25 2013/10/07 15:39:22 tom Exp $
+-- $Id: CHANGES,v 7.27 2013/12/14 15:56:54 tom Exp $
 
-2010/10/07 (c_count 7.14)
+2013/12/14 (c_count 7.14)
+	+ add script for cross-compiling NullSoft installer to MinGW.
+
+	+ minor fix for Quoted(); if the first character of a quoted string was
+	  a blank, it was added to the blanks category rather than to code.
+
 	+ improve cross-compiling, to supply getopt from porting directory
 	  for systems which lack this.
 
