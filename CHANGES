@@ -1,4 +1,11 @@
--- $Id: CHANGES,v 7.31 2015/09/25 00:43:30 tom Exp $
+-- $Id: CHANGES,v 7.32 2018/05/12 01:09:51 tom Exp $
+
+2018/05/11 (c_count 7.18)
+	+ modify spec-file to eliminate debug-symbols
+
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2015/09/24 (c_count 7.17)
 	+ fix breakage in configure script from 7.16 (report by Somchai Smythe).

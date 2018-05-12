@@ -1,3 +1,9 @@
+ccount (7.18) unstable; urgency=low
+
+  * routine packaging updates
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Fri, 11 May 2018 21:11:46 -0400
+
 ccount (7.17) unstable; urgency=low
 
   * configure-fixes for gcc 5.x

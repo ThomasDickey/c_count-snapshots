@@ -1,7 +1,7 @@
 Summary: c_count - C-language line counter
 %define AppProgram c_count
-%define AppVersion 7.17
-# $Id: c_count.spec,v 1.8 2015/09/25 00:20:01 tom Exp $
+%define AppVersion 7.18
+# $Id: c_count.spec,v 1.9 2018/05/12 01:21:45 tom Exp $
 Name: %{AppProgram}
 Version: %{AppVersion}
 Release: 1
@@ -19,6 +19,8 @@ code.   C_count  also  shows  the  presence  of  unbalanced (or nested)
 comments, unbalanced quotation marks and illegal characters.
 
 %prep
+
+%define debug_package %{nil}
 
 %setup -q -n %{AppProgram}-%{AppVersion}
 
@@ -49,6 +51,9 @@ strip $RPM_BUILD_ROOT%{_bindir}/%{AppProgram}
 
 %changelog
 # each patch should add its ChangeLog entries here
+
+* Fri May 11 2018 Thomas Dickey
+- suppress debug-symbols
 
 * Fri Jul 16 2010 Thomas Dickey
 - initial version
