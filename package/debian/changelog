@@ -1,3 +1,9 @@
+ccount (7.19) unstable; urgency=low
+
+  * maintenance updates
+
+ -- Thomas E. Dickey <dickey@invisible-island.net>  Tue, 22 Sep 2020 20:28:39 -0400
+
 ccount (7.18) unstable; urgency=low
 
   * routine packaging updates

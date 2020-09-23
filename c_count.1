@@ -1,15 +1,17 @@
-.\" $Id: c_count.1,v 7.9 2010/07/17 13:56:47 tom Exp $
-.de EX
-.RS
+.\" $Id: c_count.1,v 7.10 2020/09/23 00:44:37 tom Exp $
+.de NS
+.ie n  .sp
+.el    .sp .5
+.ie n  .in +4
+.el    .in +2
 .nf
-.sp
-.fam C	\" groff: Courier
+.ft C			\" Courier
 ..
-.de EE
+.de NE
 .fi
-.RE
-.sp .5
-.fam T	\" groff: Times-Roman (default)
+.ft R
+.ie n  .in -4
+.el    .in -2
 ..
 .
 .TH C_COUNT 1
@@ -104,11 +106,11 @@ Unbalanced quotes may be legal.
 The C preprocessor permits you to
 define symbols which contain an unbalanced quote mark, for example:
 .ne 3
-.EX
+.NS
 #define	WARN	(void)printf("** warning:
 	...
 	WARN item \"%s\" not found\n", token);
-.EE
+.NE
 .PP
 Rather than duplicate all of the complexity of the C preprocessor,
 \fBc_count\fR permits you to specify symbols which contain
@@ -155,9 +157,9 @@ define tokens which may
 evaluate with an unbalanced quote mark '\fB"\fR'.
 For example,
 .RS
-.EX
+.NS
 \-q\ WARN
-.EE
+.NE
 .PP
 tells \fBc_count\fR that the token "WARN" contains a quote mark.
 .RE
@@ -179,7 +181,8 @@ direct \fBc_count\fR not only
 to print a summary line for each file, but also to print a running
 summary showing each source line, together with the current line
 and statement numbers, as well as the cumulative flags.
-Repeating the option causes \fBc_count\fP to also show block (curly-brace) levels.
+Repeating the option causes \fBc_count\fP
+to also show block (curly-brace) levels.
 .TP
 .BI \-w " LEN"
 specify the length for identifiers beyond which we should report an error.
@@ -199,7 +202,7 @@ itself from the standard input.
 Following is an example of the use of \fBc_count\fR, showing
 the detailed types of information which it reports.
 The percentages add up to 100%, since overlapping data are discounted.
-.EX
+.NS
 ~/src/count (5) c_count *.[ch] */*.[ch]
   1165   418   |c_count.c
     17     0   |config.h
@@ -239,7 +242,7 @@ The percentages add up to 100%, since overlapping data are discounted.
     70	top-level blocks/statements
      7	maximum blocklevel
   2.67	ratio of blocklevel:code
-.EE
+.NE
 .PP
 If you use the "\fB\-p\fR" option,
 \fBc_count\fR prints the detailed information
