@@ -1,10 +1,10 @@
-$Id: COPYING,v 7.12 2018/05/12 01:18:14 tom Exp $
+$Id: COPYING,v 7.13 2020/09/23 00:40:42 tom Exp $
 
 C_COUNT
 
 --------------------------------------------------------------------------------
 
-Copyright 1985-2015,2018 by Thomas E. Dickey
+Copyright 1985-2018,2020 by Thomas E. Dickey
 All Rights Reserved.
 
 Permission to use, copy, modify, and distribute this software and its
