@@ -1,4 +1,9 @@
--- $Id: CHANGES,v 7.34 2020/09/23 00:29:49 tom Exp $
+-- $Id: CHANGES,v 7.35 2021/01/09 15:05:38 tom Exp $
+
+2021/01/09 (c_count 7.20)
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2020/09/22 (c_count 7.19)
 	+ remove obsolete makefile-rules
