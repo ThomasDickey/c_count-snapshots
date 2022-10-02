@@ -1,4 +1,4 @@
-$! $Header: /users/source/archives/c_count.vcs/porting/RCS/vmsbuild.com,v 1.2 1995/05/21 23:05:44 tom Exp $
+$! $Id: vmsbuild.com,v 1.3 1995/05/21 23:05:44 tom Exp $
 $! VMS build-script for C_COUNT.  Requires "VAX-C" or "DEC-C".
 $!
 $
