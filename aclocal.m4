@@ -1,4 +1,4 @@
-dnl $Id: aclocal.m4,v 7.21 2022/10/02 15:11:02 tom Exp $
+dnl $Id: aclocal.m4,v 7.22 2022/12/02 21:33:40 tom Exp $
 dnl ---------------------------------------------------------------------------
 dnl Copyright 1999-2021,2022 -- Thomas E. Dickey
 dnl
@@ -666,6 +666,7 @@ then
 	AC_CHECKING([for $CC __attribute__ directives])
 cat > "conftest.$ac_ext" <<EOF
 #line __oline__ "${as_me:-configure}"
+#include <stdio.h>
 #include "confdefs.h"
 #include "conftest.h"
 #include "conftest.i"

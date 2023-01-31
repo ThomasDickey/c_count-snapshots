@@ -1,4 +1,7 @@
--- $Id: CHANGES,v 7.36 2022/10/02 15:12:25 tom Exp $
+-- $Id: CHANGES,v 7.37 2023/01/30 01:23:10 tom Exp $
+
+2023/01/30 (c_count 7.22)
+	+ updated configure macros
 
 2022/10/02 (c_count 7.21)
 	+ updated configure macros
