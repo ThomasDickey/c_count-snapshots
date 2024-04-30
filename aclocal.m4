@@ -1,6 +1,6 @@
-dnl $Id: aclocal.m4,v 7.22 2022/12/02 21:33:40 tom Exp $
+dnl $Id: aclocal.m4,v 7.23 2024/01/07 11:34:16 tom Exp $
 dnl ---------------------------------------------------------------------------
-dnl Copyright 1999-2021,2022 -- Thomas E. Dickey
+dnl Copyright 1999-2022,2024 -- Thomas E. Dickey
 dnl
 dnl Permission is hereby granted, free of charge, to any person obtaining a
 dnl copy of this software and associated documentation files (the
@@ -121,7 +121,7 @@ AC_SUBST(EXTRA_CPPFLAGS)
 
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_ANSI_CC_CHECK version: 13 updated: 2012/10/06 11:17:15
+dnl CF_ANSI_CC_CHECK version: 14 updated: 2024/01/07 06:34:16
 dnl ----------------
 dnl This was originally adapted from the macros 'fp_PROG_CC_STDC' and
 dnl 'fp_C_PROTOTYPES' in the sharutils 4.2 distribution.
@@ -156,8 +156,8 @@ do
 choke me
 #endif
 #endif
+extern int test (int i, double x);
 ],[
-	int test (int i, double x);
 	struct s1 {int (*f) (int a);};
 	struct s2 {int (*f) (double a);};],
 	[cf_cv_ansi_cc="$cf_arg"; break])
@@ -238,7 +238,7 @@ ifelse([$3],,[    :]dnl
 ])dnl
 ])])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_C11_NORETURN version: 3 updated: 2021/03/28 11:36:23
+dnl CF_C11_NORETURN version: 4 updated: 2023/02/18 17:41:25
 dnl ---------------
 AC_DEFUN([CF_C11_NORETURN],
 [
@@ -252,8 +252,7 @@ AC_MSG_RESULT($enable_stdnoreturn)
 if test $enable_stdnoreturn = yes; then
 AC_CACHE_CHECK([for C11 _Noreturn feature], cf_cv_c11_noreturn,
 	[AC_TRY_COMPILE([
-#include <stdio.h>
-#include <stdlib.h>
+$ac_includes_default
 #include <stdnoreturn.h>
 static _Noreturn void giveup(void) { exit(0); }
 	],
@@ -277,7 +276,7 @@ AC_SUBST(HAVE_STDNORETURN_H)
 AC_SUBST(STDC_NORETURN)
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_CC_ENV_FLAGS version: 10 updated: 2020/12/31 18:40:20
+dnl CF_CC_ENV_FLAGS version: 11 updated: 2023/02/20 11:15:46
 dnl ---------------
 dnl Check for user's environment-breakage by stuffing CFLAGS/CPPFLAGS content
 dnl into CC.  This will not help with broken scripts that wrap the compiler
@@ -318,7 +317,7 @@ case "$CC" in
 	AC_MSG_WARN(your environment uses the CC variable to hold CFLAGS/CPPFLAGS options)
 	# humor him...
 	cf_prog=`echo "$CC" | sed -e 's/	/ /g' -e 's/[[ ]]* / /g' -e 's/[[ ]]*[[ ]]-[[^ ]].*//'`
-	cf_flags=`echo "$CC" | ${AWK:-awk} -v prog="$cf_prog" '{ printf("%s", [substr]([$]0,1+length(prog))); }'`
+	cf_flags=`echo "$CC" | sed -e "s%^$cf_prog%%"`
 	CC="$cf_prog"
 	for cf_arg in $cf_flags
 	do
@@ -376,7 +375,7 @@ if test ".$system_name" != ".$cf_cv_system_name" ; then
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_CLANG_COMPILER version: 8 updated: 2021/01/01 13:31:04
+dnl CF_CLANG_COMPILER version: 9 updated: 2023/02/18 17:41:25
 dnl -----------------
 dnl Check if the given compiler is really clang.  clang's C driver defines
 dnl __GNUC__ (fooling the configure script into setting $GCC to yes) but does
@@ -398,7 +397,7 @@ if test "$ifelse([$1],,[$1],GCC)" = yes ; then
 	AC_TRY_COMPILE([],[
 #ifdef __clang__
 #else
-make an error
+#error __clang__ is not defined
 #endif
 ],[ifelse([$2],,CLANG_COMPILER,[$2])=yes
 ],[])
@@ -444,7 +443,7 @@ if test "x$ifelse([$2],,CLANG_COMPILER,[$2])" = "xyes" ; then
 fi
 ])
 dnl ---------------------------------------------------------------------------
-dnl CF_CONST_X_STRING version: 7 updated: 2021/06/07 17:39:17
+dnl CF_CONST_X_STRING version: 8 updated: 2023/12/01 17:22:50
 dnl -----------------
 dnl The X11R4-X11R6 Xt specification uses an ambiguous String type for most
 dnl character-strings.
@@ -479,6 +478,7 @@ AC_TRY_COMPILE(
 AC_CACHE_CHECK(for X11/Xt const-feature,cf_cv_const_x_string,[
 	AC_TRY_COMPILE(
 		[
+#undef  _CONST_X_STRING
 #define _CONST_X_STRING	/* X11R7.8 (perhaps) */
 #undef  XTSTRINGDEFINES	/* X11R5 and later */
 #include <stdlib.h>
@@ -749,7 +749,7 @@ rm -rf ./conftest*
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_GCC_VERSION version: 8 updated: 2019/09/07 13:38:36
+dnl CF_GCC_VERSION version: 9 updated: 2023/03/05 14:30:13
 dnl --------------
 dnl Find version of gcc, and (because icc/clang pretend to be gcc without being
 dnl compatible), attempt to determine if icc/clang is actually used.
@@ -758,7 +758,7 @@ AC_REQUIRE([AC_PROG_CC])
 GCC_VERSION=none
 if test "$GCC" = yes ; then
 	AC_MSG_CHECKING(version of $CC)
-	GCC_VERSION="`${CC} --version 2>/dev/null | sed -e '2,$d' -e 's/^.*(GCC[[^)]]*) //' -e 's/^.*(Debian[[^)]]*) //' -e 's/^[[^0-9.]]*//' -e 's/[[^0-9.]].*//'`"
+	GCC_VERSION="`${CC} --version 2>/dev/null | sed -e '2,$d' -e 's/^[[^(]]*([[^)]][[^)]]*) //' -e 's/^[[^0-9.]]*//' -e 's/[[^0-9.]].*//'`"
 	test -z "$GCC_VERSION" && GCC_VERSION=unknown
 	AC_MSG_RESULT($GCC_VERSION)
 fi
@@ -906,7 +906,7 @@ if test "$cf_cv_getopt_header" = getopt.h ; then
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_INTEL_COMPILER version: 8 updated: 2021/01/01 16:53:59
+dnl CF_INTEL_COMPILER version: 9 updated: 2023/02/18 17:41:25
 dnl -----------------
 dnl Check if the given compiler is really the Intel compiler for Linux.  It
 dnl tries to imitate gcc, but does not return an error when it finds a mismatch
@@ -932,7 +932,7 @@ if test "$ifelse([$1],,[$1],GCC)" = yes ; then
 		AC_TRY_COMPILE([],[
 #ifdef __INTEL_COMPILER
 #else
-make an error
+#error __INTEL_COMPILER is not defined
 #endif
 ],[ifelse([$2],,INTEL_COMPILER,[$2])=yes
 cf_save_CFLAGS="$cf_save_CFLAGS -we147"
@@ -1379,7 +1379,7 @@ if test "$with_dmalloc" = yes ; then
 fi
 ])dnl
 dnl ---------------------------------------------------------------------------
-dnl CF_WITH_MAN2HTML version: 12 updated: 2021/01/03 18:30:50
+dnl CF_WITH_MAN2HTML version: 13 updated: 2023/11/23 06:40:35
 dnl ----------------
 dnl Check for man2html and groff.  Prefer man2html over groff, but use groff
 dnl as a fallback.  See
@@ -1421,7 +1421,7 @@ esac
 
 AC_MSG_CHECKING(for program to convert manpage to html)
 AC_ARG_WITH(man2html,
-	[  --with-man2html=XXX     use XXX rather than groff],
+	[[  --with-man2html[=XXX]   use XXX rather than groff]],
 	[cf_man2html=$withval],
 	[cf_man2html=$cf_man2html])
 

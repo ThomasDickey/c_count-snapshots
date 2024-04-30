@@ -1,4 +1,4 @@
-MANIFEST for c_count, version v7_22
+MANIFEST for c_count, version v7_23
 --------------------------------------------------------------------------------
 MANIFEST                        this file
 CHANGES                         extracted change-log from c_count.c
@@ -27,10 +27,9 @@ package/debian/control          debian build script
 package/debian/copyright        debian build script
 package/debian/docs             debian build script
 package/debian/rules            debian build script
+package/debian/watch            debian build script
 package/debian/source           subdirectory
 package/debian/source/format    debian build script
-package/debian                  subdirectory
-package/debian/watch            debian build script
 porting                         subdirectory
 porting/README                  description of files in porting directory
 porting/getopt.c                public-domain version of 'getopt()'

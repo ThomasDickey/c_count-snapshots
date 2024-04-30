@@ -1,11 +1,17 @@
-.\" $Id: c_count.1,v 7.10 2020/09/23 00:44:37 tom Exp $
+.\" $Id: c_count.1,v 7.11 2024/04/29 23:49:02 tom Exp $
+.TH C_COUNT 1 2024-04-29 "C-language line counter" "User commands"
+.ie n .ds CW R
+.el   \{
+.ie \n(.g .ds CW CR
+.el       .ds CW CW
+.\}
 .de NS
 .ie n  .sp
 .el    .sp .5
 .ie n  .in +4
 .el    .in +2
 .nf
-.ft C			\" Courier
+.ft \*(CW
 ..
 .de NE
 .fi
@@ -14,27 +20,22 @@
 .el    .in -2
 ..
 .
-.TH C_COUNT 1
 .hy 0
 .
 .SH NAME
-.PP
-\fBc_count\fR \- C-language line counter
-.
-.SH USAGE
-.PP
-\fBc_count\fI [options] [file-specifications]
-.
+\fBc_count\fR \-
+C-language line counter
 .SH SYNOPSIS
+\fBc_count\fI [options] [file-specifications]\fR
 .PP
 \fBC_count\fR counts lines and statements in C-language source files.
 It provides related statistics on the amount of whitespace, comments
 and code.
-\fBC_count\fR also shows the presence of unbalanced (or
-nested) comments, unbalanced quotation marks and illegal characters.
+\fBC_count\fR also shows the presence of unbalanced
+(or nested) comments,
+unbalanced quotation marks and illegal characters.
 .
 .SH DESCRIPTION
-.PP
 \fBC_count\fR reads one or more C-language source files and displays
 simple statistics about them.
 It counts statements (i.e., sequences
@@ -103,7 +104,8 @@ will report the mismatch as an unterminated block.
 file contains identifiers longer than specified by the \fB\-w\fP option.
 .PP
 Unbalanced quotes may be legal.
-The C preprocessor permits you to
+When \fBc_count\fP was first created,
+the C preprocessor permitted one to
 define symbols which contain an unbalanced quote mark, for example:
 .ne 3
 .NS
@@ -189,7 +191,6 @@ specify the length for identifiers beyond which we should report an error.
 If this option is not given, \fBc_count\fR reports identifiers longer than
 31 characters.
 .SH OPERATIONS
-.PP
 \fBC_count\fR reads one or more C language source files and writes
 its statistics to standard output.
 If you do not give any file names,
@@ -249,19 +250,15 @@ If you use the "\fB\-p\fR" option,
 for each file, as well as for all files together.
 .
 .SH ENVIRONMENT
-.PP
 \fBC_count\fR runs in a POSIX environment.
 Execute it on VAX/VMS by defining it as a foreign command.
 .
 .SH FILES
-.PP
 \fBC_count\fR is a single binary module, that uses no auxiliary
 files (e.g., \fBC_COUNT.EXE\fR on VAX/VMS).
 .
-.SH AUTHOR
-.PP
+.SH AUTHORS
 Thomas Dickey.
 .
 .SH SEE ALSO
-.PP
 wc\ (1)

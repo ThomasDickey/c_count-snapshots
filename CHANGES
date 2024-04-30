@@ -1,4 +1,11 @@
--- $Id: CHANGES,v 7.37 2023/01/30 01:23:10 tom Exp $
+-- $Id: CHANGES,v 7.39 2024/04/29 23:52:06 tom Exp $
+
+2024/04/29 (c_count 7.23)
+	+ improve style/formatting of manpage
+
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2023/01/30 (c_count 7.22)
 	+ updated configure macros
@@ -161,7 +168,7 @@
 
 1997/10/05 (c_count 7.4)
 
-	+ change copyright terms to allow commerical distribution.
+	+ change copyright terms to allow commercial distribution.
 
 	+ add -b option, to display blocklevel statistics.
 
