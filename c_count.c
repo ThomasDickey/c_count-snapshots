@@ -3,6 +3,7 @@
  * Author:	T.E.Dickey
  * Created:	04 Dec 1985
  * Modified:
+ *		02 Feb 2025, stricter gcc15 warnings.
  *		15 Dec 2013, ensure that parse-state returns to "code" after a
  *			     comment is completed.  Extend parsing for numbers
  *			     to improve error-checking.
@@ -101,7 +102,7 @@
 #include "patchlev.h"
 
 #ifndef	NO_IDENT
-static const char Id[] = "$Id: c_count.c,v 7.62 2013/12/16 01:36:13 tom Exp $";
+static const char Id[] = "$Id: c_count.c,v 7.63 2025/02/02 22:08:45 tom Exp $";
 #endif
 
 #include <stdio.h>
@@ -276,7 +277,7 @@ static int wrote_last;
 static int newsum;		/* TRUE iff we need a summary */
 
 /* buffer line for verbose-mode */
-static char *big_line = 0;
+static char *big_line = NULL;
 static size_t big_used = 0;
 static size_t big_size = 0;
 
@@ -634,7 +635,7 @@ Token(int c)
     PSTATE bstate = pstate;
     int j = 0;
 
-    if (bfr == 0)
+    if (bfr == NULL)
 	bfr = malloc(have = 80);
 
     if (tstate == tNone) {
@@ -703,11 +704,11 @@ Token(int c)
 		if (c <= 0) {
 		    break;
 		} else if (gotend) {
-		    if ((strchr) (suffixes, c) == 0) {
+		    if ((strchr) (suffixes, c) == NULL) {
 			break;
 		    }
 		} else if (gotdot || (baseis == 0 && digits && !isdigit(c)
-				      && (strchr) (exponents, c) != 0)) {
+				      && (strchr) (exponents, c) != NULL)) {
 		    if (gotexp == 1) {
 			if (c == '+' || c == '-' || isdigit(c)) {
 			    gotexp = 2;
@@ -721,10 +722,10 @@ Token(int c)
 			    break;
 			}
 		    } else if (gotexp == 3) {
-			if ((strchr) (suffixes, c) == 0) {
+			if ((strchr) (suffixes, c) == NULL) {
 			    break;
 			}
-		    } else if ((strchr) (exponents, c) != 0) {
+		    } else if ((strchr) (exponents, c) != NULL) {
 			gotdot = 1;
 			gotexp = 1;
 		    } else if (isdigit(c)) {
@@ -742,7 +743,7 @@ Token(int c)
 		    } else {
 			break;
 		    }
-		} else if ((strchr) (suffixes, c) != 0) {
+		} else if ((strchr) (suffixes, c) != NULL) {
 		    if (digits) {
 			gotend = 1;
 		    } else {
@@ -767,7 +768,7 @@ Token(int c)
 	/* FALLTHRU */
     case tChar:		/* punctuation */
 	if (debug) {
-	    if (isgraph(c) && strchr("{};/\\", c) == 0)
+	    if (isgraph(c) && strchr("{};/\\", c) == NULL)
 		DEBUG("char\t%c\n", c);
 	}
 	c = inFile();
@@ -823,7 +824,7 @@ countChar(int ch)
 	if (verbose) {
 	    if (big_used + 4 >= big_size) {
 		big_line = realloc(big_line, big_size *= 2);
-		if (big_line == 0) {
+		if (big_line == NULL) {
 		    perror("realloc");
 		    exit(EXIT_FAILURE);
 		}
@@ -1254,7 +1255,7 @@ filter_history(int first)
 	    while ((d = strchr(s, '$')) != NULL) {
 		s = d + 1;
 		if (!strncmp(d, "$Log", (size_t) 4)
-		    && (t = strchr(s, '$')) != 0) {
+		    && (t = strchr(s, '$')) != NULL) {
 		    hstate = rlog;
 		    Disregard(d, t);
 		    break;
@@ -1491,7 +1492,7 @@ main(int argc, char **argv)
 	    return EXIT_SUCCESS;
 	case 'v':
 	    verbose++;
-	    if (big_line == 0)
+	    if (big_line == NULL)
 		big_line = malloc(big_size = 1024);
 	    break;
 	case 'w':
@@ -1584,7 +1585,7 @@ main(int argc, char **argv)
 	PRINTF("\n");
     }
 #ifdef NO_LEAKS
-    if (big_line != 0)
+    if (big_line != NULL)
 	free(big_line);
     free(quotvec);
 #endif

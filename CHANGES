@@ -1,4 +1,9 @@
--- $Id: CHANGES,v 7.39 2024/04/29 23:52:06 tom Exp $
+-- $Id: CHANGES,v 7.40 2025/02/02 22:01:27 tom Exp $
+
+2025/02/02 (c_count 7.24)
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2024/04/29 (c_count 7.23)
 	+ improve style/formatting of manpage
