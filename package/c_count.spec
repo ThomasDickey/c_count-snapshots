@@ -1,14 +1,12 @@
 Summary: c_count - C-language line counter
-%define AppProgram c_count
-%define AppVersion 7.24
-# $Id: c_count.spec,v 1.15 2025/02/02 22:00:47 tom Exp $
-Name: %{AppProgram}
-Version: %{AppVersion}
+# $Id: c_count.spec,v 1.17 2025/10/01 23:51:30 tom Exp $
+Name: c_count
+Version: 7.25
 Release: 1
 License: MIT
 Group: Applications/Development
-URL: ftp://invisible-island.net/%{AppProgram}
-Source0: %{AppProgram}-%{AppVersion}.tgz
+URL: ftp://invisible-island.net/%{name}
+Source0: %{name}-%{version}.tgz
 Vendor: Thomas E. Dickey
 Packager: Thomas E. Dickey <dickey@invisible-island.net>
 
@@ -22,7 +20,7 @@ comments, unbalanced quotation marks and illegal characters.
 
 %define debug_package %{nil}
 
-%setup -q -n %{AppProgram}-%{AppVersion}
+%setup -q -n %{name}-%{version}
 
 %build
 
@@ -39,18 +37,21 @@ make
 
 make install                    DESTDIR=$RPM_BUILD_ROOT
 
-strip $RPM_BUILD_ROOT%{_bindir}/%{AppProgram}
+strip $RPM_BUILD_ROOT%{_bindir}/%{name}
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root)
-%{_bindir}/%{AppProgram}
-%{_mandir}/man1/%{AppProgram}.*
+%{_bindir}/%{name}
+%{_mandir}/man1/%{name}.*
 
 %changelog
 # each patch should add its ChangeLog entries here
+
+* Wed Oct 01 2025 Thomas E. Dickey
+- testing c_count 7.25-1
 
 * Fri May 11 2018 Thomas Dickey
 - suppress debug-symbols

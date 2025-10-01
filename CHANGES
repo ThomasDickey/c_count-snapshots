@@ -1,4 +1,9 @@
--- $Id: CHANGES,v 7.40 2025/02/02 22:01:27 tom Exp $
+-- $Id: CHANGES,v 7.42 2025/10/01 23:45:57 tom Exp $
+
+2025/10/01 (c_count 7.25)
+	+ updated configure macros
+
+	+ update config.guess and config.sub
 
 2025/02/02 (c_count 7.24)
 	+ updated configure macros
